@@ -1,0 +1,6 @@
+- insert:
+    - id: fortuneteller
+      name: dsh-fortuneteller
+      config:
+        host: 0.0.0.0
+        port: 3210

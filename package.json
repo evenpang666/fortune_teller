@@ -1,0 +1,68 @@
+{
+  "name": "dsh-fortuneteller",
+  "version": "0.1.0",
+  "description": "观象 · DeepSeek Harness 本地 AI 命理工作室",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./index.mjs",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./public/icon.svg"
+  },
+  "files": [
+    "index.mjs",
+    "client.js",
+    "cordis.patch.yml",
+    "locale",
+    "lib",
+    "public",
+    "skills",
+    "scripts",
+    "start.sh",
+    "start.bat",
+    ".env.example",
+    "README.md",
+    "docs",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node scripts/launch.mjs",
+    "dev": "node scripts/launch.mjs --no-open",
+    "test": "node --test test/*.test.mjs",
+    "check": "node scripts/check.mjs"
+  },
+  "dependencies": {
+    "astronomy-engine": "2.1.19",
+    "iztro": "2.6.2",
+    "lunar-javascript": "1.7.7"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek",
+    "fortune",
+    "bazi",
+    "tarot"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-skill": "0.0.1-rc.1",
+    "jsdom": "26.1.0"
+  }
+}
