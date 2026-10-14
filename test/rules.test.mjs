@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeChart, hexagram, draw } from '../lib/rules.mjs';
+import { makeChart, lookupNameStrokes, hexagram, draw } from '../lib/rules.mjs';
 import { TAROT_DECK, HEX_MATRIX, TRIGRAMS } from '../lib/methods.mjs';
 import { normalizeUsage, estimateCost, analyze, buildMessages } from '../lib/deepseek.mjs';
 
@@ -68,6 +68,33 @@ test('单姓、复姓、单名、双名的五格虚数规则',()=>{
   const b=makeChart('name',{surname:'欧阳',given:'修',surnameStrokes:[15,17],givenStrokes:[10]}).chart;
   assert.deepEqual(b.grids,{天格:32,人格:27,地格:11,外格:16,总格:42});
   assert.throws(()=>makeChart('name',{surname:'王',given:'知远',surnameStrokes:[4],givenStrokes:[8]}));
+});
+test('姓名无需输入笔画即可查询并排盘，简繁与复姓采用康熙口径',()=>{
+  const a=makeChart('name',{surname:'王',given:'知远'});
+  assert.deepEqual(a.chart.strokes,[4,8,17]);assert.equal(a.input.strokeMode,'auto');assert.equal(a.chart.grids.总格,29);
+  const b=makeChart('name',{surname:'刘',given:'清'}),traditional=makeChart('name',{surname:'劉',given:'清'});
+  assert.deepEqual(b.chart.strokes,[15,12]);assert.deepEqual(traditional.chart.strokes,b.chart.strokes);
+  assert.deepEqual(makeChart('name',{surname:'欧阳',given:'修'}).chart.strokes,[15,17,10]);
+  assert.equal(a.chart.strokeLookup.source.version,'0.1.1');assert.equal(a.ruleVersion,'1.1.0');
+  // Auto mode must recompute on the server rather than trusting browser arrays.
+  assert.deepEqual(makeChart('name',{surname:'王',given:'知远',strokeMode:'auto',surnameStrokes:[99],givenStrokes:[1,1]}).chart.strokes,[4,8,17]);
+});
+test('未知汉字与简繁笔画冲突不会猜值，允许用户核实后手动填写',()=>{
+  const missing=lookupNameStrokes({surname:'王',given:'𠮷'});
+  assert.equal(missing.given.length,1);assert.equal(missing.given[0].status,'missing');assert.equal(missing.complete,false);
+  assert.throws(()=>makeChart('name',{surname:'王',given:'𠮷'}),/需要核实/);
+  const ambiguous=lookupNameStrokes({surname:'于',given:'安'});
+  assert.equal(ambiguous.surname[0].status,'ambiguous');assert.equal(ambiguous.surname[0].strokes,null);
+  assert.deepEqual(ambiguous.surname[0].candidates,[{character:'于',strokes:3},{character:'於',strokes:8}]);
+  assert.throws(()=>makeChart('name',{surname:'于',given:'安'}),/需要核实/);
+  assert.equal(lookupNameStrokes({surname:'萬',given:'学'}).surname[0].status,'ambiguous');
+  const manual=makeChart('name',{surname:'于',given:'安',strokeMode:'manual',surnameStrokes:[3],givenStrokes:[6]});
+  assert.deepEqual(manual.chart.strokes,[3,6]);assert.match(manual.chart.strokeSource,/手动/);
+});
+test('姓名查询校验汉字和字数，手动笔画仍验证每字对应与范围',()=>{
+  for(const input of [{surname:'A',given:'安'},{surname:'欧阳王',given:'安'},{surname:'王',given:''}])assert.throws(()=>lookupNameStrokes(input));
+  assert.throws(()=>makeChart('name',{surname:'王',given:'知远',strokeMode:'manual',surnameStrokes:[4],givenStrokes:[8]}));
+  assert.throws(()=>makeChart('name',{surname:'王',given:'清',strokeMode:'manual',surnameStrokes:[4],givenStrokes:[0]}));
 });
 test('求签不生成未存在的古签诗，签号边界有效',()=>{
   assert.equal(makeChart('lot',{question:'前行'},()=>0).chart.hexagram.name,'乾');

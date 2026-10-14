@@ -48,22 +48,51 @@ function formFields(m) {
   if(m.id==='bazi')html+='<label class="field"><span>子时换日规则</span><select name="sect"><option value="2">午夜 00:00 换日（晚子时日柱不换）</option><option value="1">晚子时 23:00 换日</option></select></label>';
   if(m.id==='ziwei')html+='<label class="check-row"><input name="fixLeap" type="checkbox" checked>闰月按半月规则调整</label>';
   if(m.id==='tarot')html+='<label class="field"><span>选择牌阵</span><select name="spread"><option value="three">三张牌 · 过去 / 现在 / 未来趋势</option><option value="single">单张牌 · 当下的启示</option><option value="decision">选择牌阵 · A / B / 需要留意</option></select></label><label class="check-row"><input name="reversals" type="checkbox" checked>启用正逆位</label>';
-  if(m.id==='name')html+=`<div class="form-row">${field('surname','姓氏','text','required maxlength="2" placeholder="例如：王 / 欧阳"')}${field('given','名字','text','required maxlength="2" placeholder="例如：知远"')}</div>${field('surnameStrokes','姓氏康熙笔画','text','required placeholder="例如：4；复姓：15, 17"','按字序填写，用英文逗号分隔。')}${field('givenStrokes','名字康熙笔画','text','required placeholder="例如：8, 17"','请按《康熙字典》核实；简体常用笔画不能替代。')}`;
+  if(m.id==='name')html+=`<div class="form-row">${field('surname','姓氏','text','required maxlength="4" placeholder="例如：王 / 欧阳"')}${field('given','名字','text','required maxlength="4" placeholder="例如：知远"')}</div><div id="name-stroke-status" class="stroke-status" role="status" aria-live="polite">输入姓氏与名字后，自动查询康熙笔画。</div><label class="check-row"><input name="manualStrokes" type="checkbox">手动核实 / 调整笔画</label>${field('surnameStrokes','姓氏康熙笔画','text','readonly placeholder="自动查询"','按姓氏字序排列；手动模式用逗号分隔。')}${field('givenStrokes','名字康熙笔画','text','readonly placeholder="自动查询"','采用姓名学康熙笔画口径，非现代简体笔画。')}<button type="button" id="name-stroke-refresh" class="button secondary full">重新自动查询笔画 ↻</button>`;
   if(m.id==='poker')html+='<div class="tag-list"><span>♥ 情感与关系</span><span>♦ 资源与事务</span><span>♣ 行动与成长</span><span>♠ 挑战与边界</span></div>';
   if(m.id==='iching')html+='<p class="tiny">程序依次投掷三枚铜钱六次，保留每次点数。初爻在下，上爻在上；6 与 9 为变爻。</p>';
   if(m.id==='lot')html+='<p class="tiny">以六十四卦为签目，静心后等概率抽取一签。此签库为易经卦签，未使用或声称属于任何寺庙签谱。</p>';
   html+=`<label class="field"><span>${['tarot','poker','iching','lot'].includes(m.id)?'此刻，你想探索什么？':'想重点探索的方向（选填）'}</span><textarea name="question" maxlength="1000" placeholder="例如：如何更好地面对工作中的新变化？" ${['tarot','poker','iching','lot'].includes(m.id)?'required':''}></textarea></label>`;
   return html;
 }
+function setupNameStrokes(form) {
+  const surname=form.elements.surname,given=form.elements.given,manual=form.elements.manualStrokes;
+  const status=form.querySelector('#name-stroke-status'),refresh=form.querySelector('#name-stroke-refresh');
+  let revision=0,timer;
+  function mode(){for(const key of ['surnameStrokes','givenStrokes']){form.elements[key].readOnly=!manual.checked;form.elements[key].required=manual.checked;}}
+  async function lookup(){
+    clearTimeout(timer);const current=++revision,s=surname.value.trim(),g=given.value.trim();
+    if(!s||!g){status.textContent='输入姓氏与名字后，自动查询康熙笔画。';return;}
+    status.textContent='正在查询康熙笔画…';
+    try{
+      const result=await api('/name-strokes',{method:'POST',body:JSON.stringify({surname:s,given:g})});
+      if(current!==revision||!form.isConnected||s!==surname.value.trim()||g!==given.value.trim())return;
+      if(!manual.checked){form.elements.surnameStrokes.value=result.surname.map(e=>e.strokes??'?').join(', ');form.elements.givenStrokes.value=result.given.map(e=>e.strokes??'?').join(', ');}
+      const entries=[...result.surname,...result.given];
+      status.innerHTML=`<div class="stroke-results">${entries.map(e=>`<span class="${e.status==='found'?'':'unresolved'}">${escapeHTML(e.character)}${e.traditional&&e.traditional!==e.character?` → ${escapeHTML(e.traditional)}`:''}：${e.strokes==null?'待核实':e.strokes+' 画'}${e.status==='ambiguous'?`（${e.candidates.map(c=>escapeHTML(c.character)+' '+c.strokes+' 画').join(' / ')}）`:''}</span>`).join('')}</div><p>${result.complete?'已查询到全部笔画；可勾选手动调整进行核实。':'存在未收录或字形有差异的字，请勾选手动调整，按字序补全笔画。'}</p><small>${escapeHTML(result.source.label)}</small>`;
+    }catch(error){if(current===revision&&form.isConnected)status.textContent=error.message+'；也可勾选手动调整填写。';}
+  }
+  function changed(event){
+    clearTimeout(timer);revision++;
+    form.elements[event.target===surname?'surnameStrokes':'givenStrokes'].value='';
+    status.textContent=surname.value.trim()&&given.value.trim()?'正在查询康熙笔画…':'输入姓氏与名字后，自动查询康熙笔画。';
+    timer=setTimeout(lookup,250);
+  }
+  surname.addEventListener('input',changed);given.addEventListener('input',changed);manual.addEventListener('change',mode);
+  refresh.addEventListener('click',()=>{manual.checked=false;mode();lookup();});
+  mode();
+}
 function renderMethod(id) {
   const m=methods.find(m=>m.id===id);if(!m){location.hash='/';return;}
   shell(`<a href="#/" class="back-link">← 返回探索</a><div class="page-intro">${methodIcon(m)}<div><h1>${m.name}</h1><p>${m.description}</p></div></div><div class="workspace"><section class="panel"><h2>准备你的${m.name==='塔罗'||m.name==='扑克'?'问题':'信息'}</h2><form id="reading-form" data-method="${m.id}">${formFields(m)}<button class="button full" type="submit">${m.action} <span>→</span></button><p class="busy-note">本地计算，不消耗 AI tokens</p></form><div class="rule-note"><strong>本次采用的规则</strong><br>${m.rule}</div><details class="details"><summary>关于这一体系</summary><p>不同传承可能采用不同规则，本工作室明确采用上述体系。传统解读供文化探索与自我反思参考。原始计算数据可在结果中查看和导出。</p></details></section><section class="panel" id="result-area"><div class="preview-empty"><div class="preview-symbol">${m.icon}</div><h3>从一个问题，一份好奇开始。</h3><p>填写左侧信息，生成你的盘面。<br>再让 DeepSeek 为它带来新的解读。</p><span class="tiny">生成结果会自动保存到历史记录</span></div></section></div>`,m.name,m.id);
+  if(m.id==='name')setupNameStrokes($('#reading-form'));
   $('#reading-form').addEventListener('submit',async event=>{
     event.preventDefault();const form=event.currentTarget;const submit=form.querySelector('button[type=submit]');submit.disabled=true;submit.innerHTML='<span class="spinner"></span>正在生成…';
     const data=Object.fromEntries(new FormData(form));
     for(const name of ['offset','sect'])if(data[name]!==undefined)data[name]=Number(data[name]);
     for(const name of ['reversals','fixLeap'])if(form.elements[name])data[name]=form.elements[name].checked;
     for(const name of ['surnameStrokes','givenStrokes'])if(data[name]!==undefined)data[name]=data[name].split(/[,，\s]+/).filter(Boolean).map(Number);
+    if(m.id==='name'){data.strokeMode=form.elements.manualStrokes.checked?'manual':'auto';delete data.manualStrokes;if(data.strokeMode==='auto'){delete data.surnameStrokes;delete data.givenStrokes;}}
     try{const record=await api('/readings',{method:'POST',body:JSON.stringify({method:m.id,input:data})});records.unshift(record);location.hash='/record/'+record.id;}
     catch(error){toast(error.message);submit.disabled=false;submit.textContent=m.action+' →';}
   });

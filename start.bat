@@ -12,6 +12,7 @@ if errorlevel 1 (pause & exit /b 1)
 if not exist node_modules\lunar-javascript\package.json goto install
 if not exist node_modules\iztro\package.json goto install
 if not exist node_modules\astronomy-engine\package.json goto install
+if not exist node_modules\shunshi-kangxi-core\package.json goto install
 goto launch
 :install
 call npm ci --omit=dev --no-audit --no-fund

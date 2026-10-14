@@ -1,14 +1,20 @@
 ---
 name: fortune-name
-description: 根据用户核实的康熙笔画与观象计算的姓名五格、三才进行文化解读，不猜测汉字笔画或姓名决定命运。
+description: 根据观象自动查询或用户核实的康熙笔画及姓名五格、三才进行文化解读，不猜测笔画或声称姓名决定命运。
 ---
 
 # 姓名五格解读
 
-先核对 input.surname、given、surnameStrokes、givenStrokes 与 chart.grids、elements、threeTalents。支持姓与名各一至二个汉字。笔画由用户提供，程序没有自动核实《康熙字典》，尤其偏旁折算和繁简转换不能自行假定。
+先核对 input.surname、given、surnameStrokes、givenStrokes、strokeMode 与 chart.grids、elements、threeTalents、strokeSource、strokeLookup。支持姓与名各一至二个汉字。
+
+strokeMode=auto 时，笔画由本地 shunshi-kangxi-core 0.1.1 字表确定性查询，采用姓名学康熙笔画口径，而不是现代简体书写笔画。简繁字形的笔画有差异、或未收录时，程序不会猜测，会要求手动确认。strokeMode=manual 时，以用户核实/调整后的数组为准；strokeLookup 中的字典候选只是参考，不能覆盖用户采用的笔画。旧记录没有 strokeMode 时，沿用原记录中的笔画和来源，不重新计算。
+
+程序已经完成五格计算。解读不重新数字形、不让模型补字典笔画，不强行把一对多简繁字归一。字表是第三方整理的数据，并非统一官方姓名学标准；解释时保留这个来源边界。
 
 采用五格剖象法：天格为姓氏总笔画（单姓加 1）；人格为姓末字加名首字；地格为名字总笔画（单名加 1）；总格为全名总笔画；外格为总格减人格，再对单姓和单名分别加 1。不要把复姓名格套成单姓名格。
 
 五行对应尾数：1、2 木；3、4 火；5、6 土；7、8 金；9、0 水。三才依天格、人格、地格排列。只解释已计算的数字结构，不虚构八十一数理出处、吉凶诗或自动打分。
 
 文字释义、音韵与意象可以作为另一维度，标明与五格计算不同，姓名里的字义不确定时直接说明。五格属于近现代姓名学流派，不是统一官方命理规则；不可宣称名字决定成就、健康或命运，也不把改名包装为必需。
+
+字表来源与简繁字形说明：https://github.com/shunshi-ai/kangxi-mcp/blob/main/README.zh-CN.md

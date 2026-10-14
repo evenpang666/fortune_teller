@@ -7,6 +7,21 @@ import { createApp } from '../lib/server.mjs';
 import { createStore } from '../lib/store.mjs';
 import { request as httpRequest } from 'node:http';
 
+test('姓名笔画查询无需AI且不新增历史，自动排盘记录保存实际笔画和来源',async()=>{
+  const dir=mkdtempSync(join(tmpdir(),'gx-name-strokes-'));let calls=0;const app=createApp({dataDir:dir,analyzeImpl:async()=>{calls++;throw new Error('不应调用AI');}});
+  await new Promise(resolve=>app.server.listen(0,'127.0.0.1',resolve));const base=`http://127.0.0.1:${app.server.address().port}`;
+  const post=(path,data)=>fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  try{
+    const lookup=await(await post('/api/name-strokes',{surname:'王',given:'知远'})).json();
+    assert.deepEqual(lookup.given.map(e=>e.strokes),[8,17]);assert.equal(lookup.complete,true);assert.equal(app.store.list().length,0);
+    const missing=await(await post('/api/name-strokes',{surname:'王',given:'𠮷'})).json();assert.equal(missing.complete,false);
+    assert.equal((await post('/api/name-strokes',{surname:'abc',given:'知远'})).status,400);
+    const response=await post('/api/readings',{method:'name',input:{surname:'王',given:'知远'}});assert.equal(response.status,201);
+    const record=await response.json();assert.deepEqual(record.chart.strokes,[4,8,17]);assert.equal(record.input.strokeMode,'auto');assert.equal(calls,0);
+    assert.equal(app.store.get(record.id).chart.strokeLookup.source.version,'0.1.1');
+  }finally{await app.close();rmSync(dir,{recursive:true,force:true});}
+});
+
 test('删除接口只移除指定记录及解读，历史和导出同步更新且重启后保持删除',async()=>{
   const dir=mkdtempSync(join(tmpdir(),'gx-delete-'));const app=createApp({dataDir:dir});
   await new Promise(resolve=>app.server.listen(0,'127.0.0.1',resolve));const base=`http://127.0.0.1:${app.server.address().port}`;

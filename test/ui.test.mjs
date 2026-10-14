@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
-import { makeChart } from '../lib/rules.mjs';
+import { makeChart, lookupNameStrokes } from '../lib/rules.mjs';
 import { METHODS } from '../lib/methods.mjs';
 import { DEFAULT_CONFIG } from '../lib/store.mjs';
 
 async function until(check){for(let i=0;i<100;i++){if(check())return;await new Promise(resolve=>setTimeout(resolve,5));}throw new Error('页面状态未出现');}
-function fixture({url='http://localhost:3210/#/',key=false,initialRecords=[],deleteError=false,network={available:true,urls:['http://192.168.124.62:4321'],reason:''}}={}){
+function fixture({url='http://localhost:3210/#/',key=false,initialRecords=[],deleteError=false,lookupImpl=lookupNameStrokes,network={available:true,urls:['http://192.168.124.62:4321'],reason:''}}={}){
   const dom=new JSDOM(readFileSync(new URL('../public/index.html',import.meta.url),'utf8'),{url,runScripts:'outside-only'});
   const w=dom.window;const saved=structuredClone(initialRecords);const requests=[];const operations=[];let settings={...DEFAULT_CONFIG,pricing:{...DEFAULT_CONFIG.pricing},apiKey:undefined,hasKey:key,network};
   w.matchMedia=()=>({matches:false});w.scrollTo=()=>{};
@@ -17,6 +17,7 @@ function fixture({url='http://localhost:3210/#/',key=false,initialRecords=[],del
   w.fetch=async(path,options={})=>{
     requests.push(path);
     operations.push({path,method:options.method||'GET'});
+    if(path==='/api/name-strokes')return Response.json(await lookupImpl(JSON.parse(options.body)));
     if(path==='/api/methods')return Response.json(METHODS);
     if(path==='/api/config'){if(options.method==='PUT'){const data=JSON.parse(options.body);settings={...settings,...data,hasKey:!!data.apiKey||settings.hasKey,apiKey:undefined};}return Response.json(settings);}
     if(path==='/api/readings'&&options.method==='POST'){const body=JSON.parse(options.body);const r={...makeChart(body.method,body.input),id:randomUUID(),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'prepared',report:null,usage:null,cost:null};saved.unshift(r);return Response.json(r);}
@@ -30,6 +31,46 @@ function fixture({url='http://localhost:3210/#/',key=false,initialRecords=[],del
 }
 async function navigate(w,path,selector){w.location.hash=path;await until(()=>w.document.querySelector(selector));}
 function savedReading(question){return {...makeChart('lot',{question}),id:randomUUID(),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'prepared',report:null,usage:null,cost:null};}
+
+test('姓名输入后自动显示康熙笔画，无需手填即可提交并缓存来源',async()=>{
+  const {w,saved,close}=fixture();const d=w.document;
+  try{
+    await until(()=>d.querySelector('.method-grid'));await navigate(w,'/method/name','#reading-form');const form=d.querySelector('#reading-form');
+    form.elements.surname.value='王';form.elements.given.value='知远';form.elements.given.dispatchEvent(new w.Event('input'));
+    await until(()=>form.elements.givenStrokes.value==='8, 17');
+    assert.equal(form.elements.surnameStrokes.value,'4');assert.equal(form.elements.givenStrokes.readOnly,true);
+    assert.match(d.querySelector('#name-stroke-status').textContent,/远 → 遠：17 画/);
+    form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await until(()=>d.querySelector('.record-head'));
+    assert.deepEqual(saved[0].chart.strokes,[4,8,17]);assert.equal(saved[0].input.strokeMode,'auto');assert.match(saved[0].chart.strokeSource,/离线字典/);
+  }finally{close();}
+});
+
+test('姓名查询未收录时提示手动核实，手动调整可正常提交',async()=>{
+  const {w,saved,close}=fixture();const d=w.document;
+  try{
+    await until(()=>d.querySelector('.method-grid'));await navigate(w,'/method/name','#reading-form');const form=d.querySelector('#reading-form');
+    form.elements.surname.value='王';form.elements.given.value='𠮷';d.querySelector('#name-stroke-refresh').click();
+    await until(()=>form.elements.givenStrokes.value==='?');assert.match(d.querySelector('#name-stroke-status').textContent,/待核实/);
+    form.elements.manualStrokes.checked=true;form.elements.manualStrokes.dispatchEvent(new w.Event('change'));
+    assert.equal(form.elements.givenStrokes.readOnly,false);form.elements.givenStrokes.value='6';
+    form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await until(()=>d.querySelector('.record-head'));
+    assert.deepEqual(saved[0].chart.strokes,[4,6]);assert.equal(saved[0].input.strokeMode,'manual');
+  }finally{close();}
+});
+
+test('姓名修改后旧查询不能覆盖新结果，查询返回时不会覆盖手动调整',async()=>{
+  const pending=[];const {w,close}=fixture({lookupImpl:input=>new Promise(resolve=>pending.push({input,resolve}))});const d=w.document;
+  try{
+    await until(()=>d.querySelector('.method-grid'));await navigate(w,'/method/name','#reading-form');const form=d.querySelector('#reading-form');
+    form.elements.surname.value='王';form.elements.given.value='知远';d.querySelector('#name-stroke-refresh').click();
+    form.elements.given.value='清';form.elements.given.dispatchEvent(new w.Event('input'));d.querySelector('#name-stroke-refresh').click();
+    pending[1].resolve(lookupNameStrokes(pending[1].input));await until(()=>form.elements.givenStrokes.value==='12');
+    pending[0].resolve(lookupNameStrokes(pending[0].input));await new Promise(resolve=>setTimeout(resolve,10));assert.equal(form.elements.givenStrokes.value,'12');
+    d.querySelector('#name-stroke-refresh').click();form.elements.manualStrokes.checked=true;form.elements.manualStrokes.dispatchEvent(new w.Event('change'));form.elements.givenStrokes.value='18';
+    pending[2].resolve(lookupNameStrokes(pending[2].input));await until(()=>d.querySelector('#name-stroke-status').textContent.includes('已查询到全部'));
+    assert.equal(form.elements.givenStrokes.value,'18');
+  }finally{close();}
+});
 
 test('历史记录删除确认、取消及Esc安全，删除后列表与计数立即更新并保留筛选',async()=>{
   const target=savedReading('目标记录'),kept=savedReading('保留记录');
