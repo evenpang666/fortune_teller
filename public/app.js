@@ -2,6 +2,8 @@ const $ = (selector) => document.querySelector(selector);
 const escapeHTML = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const dateLabel = value => new Date(value).toLocaleString('zh-CN',{hour12:false});
 let methods=[], records=[], config={}, filter='全部', busy=new Set(), deleting=new Set(), toastTimer, lastFocus;
+let daily=null, dailyOpen=false, dailyLoading=false, dailyError='', shareRecord=null;
+const beijingDate = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const theme=localStorage.getItem('gx-theme') || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
 document.documentElement.dataset.theme=theme;
 
@@ -17,7 +19,7 @@ function lanNotice() {
   const content=network.available?`<div class="lan-links">${network.urls.map(url=>`<div class="lan-link"><a href="${escapeHTML(url)}" target="_blank" rel="noreferrer">${escapeHTML(url)}</a><button type="button" class="button secondary" data-action="copy-lan" data-url="${escapeHTML(url)}" aria-label="复制局域网访问地址">复制地址</button></div>`).join('')}</div><p>其他设备连接同一局域网后，打开此地址即可使用，无需登录。</p>`:`<p>${escapeHTML(network.reason)}。</p>`;
   return `<aside class="lan-notice" aria-label="局域网访问"><div class="lan-notice-label"><span aria-hidden="true">↗</span><strong>局域网访问</strong></div><div class="lan-notice-content">${content}</div></aside>`;
 }
-async function copyLanUrl(url) {
+async function copyLanUrl(url,successMessage='局域网地址已复制') {
   let copied=false;
   try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(url);copied=true;}}catch{}
   if(!copied){
@@ -25,7 +27,7 @@ async function copyLanUrl(url) {
     try{copied=Boolean(document.execCommand?.('copy'));}catch{}
     finally{text.remove();focused?.focus();}
   }
-  toast(copied?'局域网地址已复制':'请长按或选中页面上的地址复制');
+  toast(copied?successMessage:'请长按或选中页面上的地址复制');
 }
 function shell(content,title='探索',active='home') {
   $('#app').innerHTML=`<div class="menu-scrim" data-action="menu"></div><aside class="sidebar"><a class="brand" href="#/"><img src="/icon.svg" alt=""><div><strong>观象</strong><small>GUANXIANG · AI STUDIO</small></div></a><nav aria-label="主导航"><div class="nav-group"><p class="nav-label">你的探索空间</p><a href="#/" class="nav-item ${active==='home'?'active':''}"><span class="nav-icon">◈</span>探索</a><a href="#/history" class="nav-item ${active==='history'?'active':''}"><span class="nav-icon">◷</span>历史记录<span class="tiny">${records.length||''}</span></a></div><div class="nav-group"><p class="nav-label">命理与占卜</p>${methods.map(m=>`<a href="#/method/${m.id}" class="nav-item ${active===m.id?'active':''}"><span class="nav-icon">${escapeHTML(m.icon)}</span>${m.name}</a>`).join('')}</div></nav><div class="sidebar-bottom"><a href="#/settings" class="nav-item ${active==='settings'?'active':''}"><span class="nav-icon">⚙</span>设置与连接</a><div class="side-note"><span class="status-dot"></span>本地工作室<br><span>让好奇有方向，让生活有回响。</span></div></div></aside><main class="main"><header class="topbar"><div class="breadcrumb"><button class="icon-button mobile-menu" data-action="menu" aria-label="展开导航">☰</button><span>我的工作室</span><span>/</span><b>${escapeHTML(title)}</b></div><div class="top-actions"><a class="pill" href="#/settings"><span class="status-dot"></span>${config.hasKey?'DeepSeek 已连接':'待配置 DeepSeek'}</a><button class="icon-button" data-action="theme" aria-label="切换浅色或深色主题">${document.documentElement.dataset.theme==='dark'?'☀':'☾'}</button></div></header><div class="content">${lanNotice()}${content}<footer class="footer"><span>观象 · 以传统文化与 AI，探索更多可能</span><span>文化探索与自我反思参考 · 解读不代表确定的未来</span></footer></div></main>`;
@@ -38,7 +40,19 @@ function item(r) {
 function renderHome() {
   const shown=methods.filter(m=>filter==='全部'||m.category===filter);
   const now=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
-  shell(`<div class="welcome"><p>给自己一点时间，听听内心的声音。</p><span>${now}</span></div><section class="hero"><div class="hero-copy"><div class="eyebrow">A MOMENT OF CLARITY</div><h1 class="hero-title">观天地，<em>照见自己。</em></h1><p>古老的智慧，遇见新的视角。<br>从八字到塔罗，以 AI 为伴，探索属于你的人生叙事。</p><div class="hero-meta"><span>✧ 八种探索方式</span><span>◷ 本地历史留存</span><span>↗ DeepSeek 驱动</span></div></div><div class="cosmos" aria-hidden="true"><div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div><div class="cosmos-center">☯</div><span class="star s1">✦</span><span class="star s2">✧</span><span class="star s3">✧</span><span class="orbit-label l1">观 · 象</span><span class="orbit-label l2">知 · 己</span></div></section><div class="section-head"><div><h2 class="serif">选择一种方式，开始探索</h2><p>每一种传统，都是认识自己的另一扇窗。</p></div><div class="filters" aria-label="按类型筛选">${['全部','东方命理','西方占星','卡牌占卜'].map(v=>`<button class="filter ${filter===v?'active':''}" data-filter="${v}" aria-pressed="${filter===v}">${v}</button>`).join('')}</div></div><section class="method-grid" aria-label="命理方式">${shown.map(m=>`<a class="method-card" href="#/method/${m.id}"><div class="card-top">${methodIcon(m)}<span class="card-category">${m.category}</span></div><h3 class="method-name">${m.name}</h3><span class="method-en">${m.en}</span><p class="card-desc">${m.description}</p><div class="card-bottom"><span>开启${m.name}探索</span><span>↗</span></div></a>`).join('')}</section><div class="section-head recent-head"><div><h2 class="serif">最近的探索</h2><p>每一次驻足，都值得被记住。</p></div><a class="text-link" href="#/history">全部记录 →</a></div><div class="recent-box">${records.length?records.slice(0,3).map(item).join(''):'<div class="empty"><span class="empty-icon">◷</span><span>故事，从你的第一次探索开始。</span><span class="tiny">生成的盘面与解读会自动留存在这里</span></div>'}</div>`);
+  shell(`<div class="welcome"><p>给自己一点时间，听听内心的声音。</p><span>${now}</span></div><section class="hero"><div class="hero-copy"><div class="eyebrow">A MOMENT OF CLARITY</div><h1 class="hero-title">观天地，<em>照见自己。</em></h1><p>古老的智慧，遇见新的视角。<br>从八字到塔罗，以 AI 为伴，探索属于你的人生叙事。</p><div class="hero-meta"><span>✧ 八种探索方式</span><span>◷ 本地历史留存</span><span>↗ DeepSeek 驱动</span></div></div><div class="cosmos" aria-hidden="true"><div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div><div class="cosmos-center">☯</div><span class="star s1">✦</span><span class="star s2">✧</span><span class="star s3">✧</span><span class="orbit-label l1">观 · 象</span><span class="orbit-label l2">知 · 己</span></div></section>${dailyCard()}<div class="section-head"><div><h2 class="serif">选择一种方式，开始探索</h2><p>每一种传统，都是认识自己的另一扇窗。</p></div><div class="filters" aria-label="按类型筛选">${['全部','东方命理','西方占星','卡牌占卜'].map(v=>`<button class="filter ${filter===v?'active':''}" data-filter="${v}" aria-pressed="${filter===v}">${v}</button>`).join('')}</div></div><section class="method-grid" aria-label="命理方式">${shown.map(m=>`<a class="method-card" href="#/method/${m.id}"><div class="card-top">${methodIcon(m)}<span class="card-category">${m.category}</span></div><h3 class="method-name">${m.name}</h3><span class="method-en">${m.en}</span><p class="card-desc">${m.description}</p><div class="card-bottom"><span>开启${m.name}探索</span><span>↗</span></div></a>`).join('')}</section><div class="section-head recent-head"><div><h2 class="serif">最近的探索</h2><p>每一次驻足，都值得被记住。</p></div><a class="text-link" href="#/history">全部记录 →</a></div><div class="recent-box">${records.length?records.slice(0,3).map(item).join(''):'<div class="empty"><span class="empty-icon">◷</span><span>故事，从你的第一次探索开始。</span><span class="tiny">生成的盘面与解读会自动留存在这里</span></div>'}</div>`);
+}
+function dailyCard() {
+  const current=daily?.date===beijingDate()?daily:null;
+  return `<section class="daily-card" aria-labelledby="daily-title"><div class="daily-heading"><div class="daily-title"><span class="daily-symbol" aria-hidden="true">☀</span><div><div class="eyebrow">TODAY'S FORTUNE</div><h2 id="daily-title" class="serif">今日运势</h2><p>看一眼黄历，为今天留一点从容。</p></div></div><button class="button secondary" data-action="daily" aria-expanded="${dailyOpen}" aria-controls="daily-content" ${dailyLoading?'disabled':''}>${dailyLoading?'正在查看…':dailyOpen?'收起 ↑':dailyError?'重新查看 →':'查看今日运势 →'}</button></div><div id="daily-content" aria-live="polite" ${dailyOpen||dailyError?'':'hidden'}>${dailyError?`<p class="error-box" role="alert">${escapeHTML(dailyError)}</p>`:current&&dailyOpen?`<div class="daily-body"><div class="daily-calendar"><p class="daily-date">${escapeHTML(current.date)} · ${escapeHTML(current.weekday)}</p><h3>${escapeHTML(current.lunar)}</h3><p class="tiny">${escapeHTML(current.ganzhi)}${current.solarTerm?' · '+escapeHTML(current.solarTerm):''}${current.festival.length?' · '+current.festival.map(escapeHTML).join(' / '):''}</p><div class="almanac-row"><span class="almanac-label good">宜</span><p>${current.yi.map(escapeHTML).join(' · ')||'无'}</p></div><div class="almanac-row"><span class="almanac-label avoid">忌</span><p>${current.ji.map(escapeHTML).join(' · ')||'无'}</p></div></div><div class="daily-assessment"><span class="daily-badge">${escapeHTML(current.assessment.label)}</span><p>${escapeHTML(current.assessment.summary)}</p><strong>今日建议</strong><p>${escapeHTML(current.assessment.advice)}</p><span class="tiny">值神 ${escapeHTML(current.spirit)} · ${escapeHTML(current.luck)}</span></div></div><p class="daily-note tiny">${escapeHTML(current.note)}</p>`:''}</div></section>`;
+}
+async function toggleDaily() {
+  if(dailyLoading)return;
+  if(dailyOpen&&daily?.date===beijingDate()){dailyOpen=false;renderHome();return;}
+  dailyLoading=true;dailyError='';dailyOpen=true;renderHome();
+  try{if(daily?.date!==beijingDate())daily=await api('/daily');}
+  catch(error){dailyError=error.message;dailyOpen=false;}
+  finally{dailyLoading=false;if(route()==='/'){renderHome();$('[data-action="daily"]')?.focus();}}
 }
 function field(name,label,type='text',extra='',hint='') {return `<label class="field"><span>${label}</span><input name="${name}" type="${type}" ${extra}>${hint?`<small>${hint}</small>`:''}</label>`;}
 function birthFields(m){return `<div class="form-row">${field('date','公历出生日期','date','required min="1900-01-01" max="2100-12-31"')}${field('time','出生时间','time','required')}</div>${m.id==='zodiac'?field('offset','出生地 UTC 时差','number','value="8" min="-12" max="14" step="0.25" required','例如中国为 +8；夏令时请填当时实际时差。'):`<label class="field"><span>传统排盘性别</span><select name="gender"><option>女</option><option>男</option></select><small>仅用于传统排盘与大运顺逆计算。</small></label><p class="tiny">填写北京时间（UTC+8）；海外出生请先换算。当前采用钟表时间，未校正真太阳时。</p>`}`;}
@@ -84,7 +98,7 @@ function setupNameStrokes(form) {
 }
 function renderMethod(id) {
   const m=methods.find(m=>m.id===id);if(!m){location.hash='/';return;}
-  shell(`<a href="#/" class="back-link">← 返回探索</a><div class="page-intro">${methodIcon(m)}<div><h1>${m.name}</h1><p>${m.description}</p></div></div><div class="workspace"><section class="panel"><h2>准备你的${m.name==='塔罗'||m.name==='扑克'?'问题':'信息'}</h2><form id="reading-form" data-method="${m.id}">${formFields(m)}<button class="button full" type="submit">${m.action} <span>→</span></button><p class="busy-note">本地计算，不消耗 AI tokens</p></form><div class="rule-note"><strong>本次采用的规则</strong><br>${m.rule}</div><details class="details"><summary>关于这一体系</summary><p>不同传承可能采用不同规则，本工作室明确采用上述体系。传统解读供文化探索与自我反思参考。原始计算数据可在结果中查看和导出。</p></details></section><section class="panel" id="result-area"><div class="preview-empty"><div class="preview-symbol">${m.icon}</div><h3>从一个问题，一份好奇开始。</h3><p>填写左侧信息，生成你的盘面。<br>再让 DeepSeek 为它带来新的解读。</p><span class="tiny">生成结果会自动保存到历史记录</span></div></section></div>`,m.name,m.id);
+  shell(`<a href="#/" class="back-link">← 返回探索</a><div class="page-intro">${methodIcon(m)}<div><h1>${m.name}</h1><p>${m.description}</p></div></div><div class="workspace"><section class="panel"><h2>准备你的${m.name==='塔罗'||m.name==='扑克'?'问题':'信息'}</h2><form id="reading-form" data-method="${m.id}">${formFields(m)}<button class="button full" type="submit">${m.action} <span>→</span></button><p class="busy-note">本地计算，不消耗 AI tokens</p></form><div class="rule-note"><strong>本次采用的规则</strong><br>${m.rule}</div><details class="details"><summary>关于这一体系</summary><p>不同传承可能采用不同规则，本工作室明确采用上述体系。传统解读供文化探索与自我反思参考。原始计算数据可在结果中查看，盘面可保存为网页分享。</p></details></section><section class="panel" id="result-area"><div class="preview-empty"><div class="preview-symbol">${m.icon}</div><h3>从一个问题，一份好奇开始。</h3><p>填写左侧信息，生成你的盘面。<br>再让 DeepSeek 为它带来新的解读。</p><span class="tiny">生成结果会自动保存到历史记录</span></div></section></div>`,m.name,m.id);
   if(m.id==='name')setupNameStrokes($('#reading-form'));
   $('#reading-form').addEventListener('submit',async event=>{
     event.preventDefault();const form=event.currentTarget;const submit=form.querySelector('button[type=submit]');submit.disabled=true;submit.innerHTML='<span class="spinner"></span>正在生成…';
@@ -116,19 +130,57 @@ function markdown(text) {
     return lines.map(l=>/^#{1,6}\s/.test(l)?'<h3>'+l.replace(/^#{1,6}\s/,'')+'</h3>':'<p>'+l+'</p>').join('');
   }).join('').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
 }
+// Older cached readings used four sections. Keep their useful interpretation and advice.
+function focusedReport(text) {
+  let skipped=null;
+  return String(text||'').split('\n').filter(line=>{
+    const heading=line.match(/^\s*(#{1,6})\s+/);
+    const title=line.trim().replace(/^#{1,6}\s*/, '').replace(/\*\*/g,'').replace(/^(?:[一二三四五六七八九十]+[、.．：:]|\d+[、.．:：)]|[（(][一二三四五六七八九十\d]+[）)])\s*/,'').replace(/[：:]$/,'').trim();
+    const removed=/^(?:盘面摘要|规则与局限)(?:[（(].*[）)])?$/.test(title);
+    const level=heading?heading[1].length:2;
+    const section=heading||removed||/^\s*\*\*[^*]+\*\*\s*$/.test(line)||/^(?:关键信息解读|与问题相关的解读|具体可实践的建议|实践建议)$/.test(title);
+    if(removed){skipped=level;return false;}
+    if(skipped!==null&&section&&level<=skipped)skipped=null;
+    return skipped===null;
+  }).join('\n').trim();
+}
+function openShare(id) {
+  const r=records.find(r=>r.id===id);if(!r)return;
+  shareRecord=r;const dialog=$('#share-dialog');
+  $('#share-record-title').textContent=r.input.question||r.chart.title;
+  const base=config.network?.urls?.[0]||location.origin;
+  $('#share-url').value=base+'/#/record/'+r.id;
+  $('#share-snapshot-note').textContent=r.report?'网页将保存当前盘面、问题、关键信息解读与实践建议。':'网页将保存当前盘面与问题；解读完成后可再次保存。';
+  lastFocus=document.activeElement;dialog.showModal();
+}
+async function saveSharedPage() {
+  if(!shareRecord)return;
+  const r=shareRecord,m=methods.find(m=>m.id===r.method),button=$('[data-action="save-share"]');
+  button.disabled=true;button.textContent='正在保存…';
+  try{
+    const response=await fetch('/styles.css');if(!response.ok)throw new Error('网页样式读取失败，请重试');
+    const css=(await response.text()).replace(/<\/style/gi,'<\\/style');
+    const report=focusedReport(r.report);
+    const html=`<!doctype html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'"><title>观象 · ${escapeHTML(m.name)} · ${escapeHTML(r.chart.title)}</title><style>${css}</style></head><body class="shared-page"><main class="shared-wrap"><header class="shared-brand"><strong>观象</strong><span>GUANXIANG · ${escapeHTML(m.name)}</span></header><section class="panel"><div class="record-head"><div><div class="eyebrow">${escapeHTML(m.en)}</div><h1 class="serif">${escapeHTML(r.chart.title)}</h1><p>${escapeHTML(dateLabel(r.createdAt))}</p></div></div>${chartView(r)}${r.input.question?`<div class="question-quote">${escapeHTML(r.input.question)}</div>`:''}${report?`<div class="report-box"><div class="eyebrow">你的解读</div>${r.truncated?'<p class="tiny">解读输出达到上限，内容可能不完整。</p>':''}<article class="report">${markdown(report)}</article></div>`:'<p class="chart-meta">此网页保存时尚未生成解读。</p>'}</section><footer class="shared-footer">观象 · 文化探索与自我反思参考<br>保存于 ${escapeHTML(dateLabel(new Date()))}</footer></main></body></html>`;
+    const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+    const link=document.createElement('a');link.href=url;link.download=`观象-${m.name}-${r.id.slice(0,8)}.html`;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    toast('盘面网页已保存，可离线打开或发送给他人');
+  }catch(error){toast(error.message);}
+  finally{button.disabled=false;button.textContent='保存盘面网页 ↓';}
+}
 function usageView(r){if(!r.report)return '';const u=r.usage,c=r.cost;return `<div class="usage-line">${u?`输入 ${u.input.toLocaleString()} tokens（缓存命中 ${u.hit.toLocaleString()}） · 输出 ${u.output.toLocaleString()} · 合计 ${u.total.toLocaleString()} tokens`:'服务未返回 token 用量，无法估算费用'}${c?`<br>本次估算 ¥${c.amount.toFixed(6)} · ${escapeHTML(c.pricing.label)}<br>单价（每百万 tokens）：缓存命中 ¥${c.pricing.hit} / 未命中 ¥${c.pricing.miss} / 输出 ¥${c.pricing.output}`:''}<br>${escapeHTML(r.model||'DeepSeek')} · ${dateLabel(r.completedAt||r.updatedAt)} · 历史结果读取不再次计费</div>`;}
 function recordContent(r) {
   const m=methods.find(m=>m.id===r.method);const loading=busy.has(r.id)||r.status==='analyzing';
-  return `<div class="record-head"><div><div class="eyebrow">${m.en}</div><h2 class="serif">${escapeHTML(r.chart.title)}</h2><p>${dateLabel(r.createdAt)} · 规则 v${r.ruleVersion}</p></div><button class="icon-button" data-export="${r.id}" aria-label="导出记录">↓</button></div>${chartView(r)}${r.input.question?`<div class="question-quote">${escapeHTML(r.input.question)}</div>`:''}<div class="rule-note"><strong>计算依据</strong><br>${escapeHTML(r.rules)}</div><div class="report-box">${r.report?`<div class="eyebrow">DEEPSEEK · 你的解读</div>${r.truncated?'<div class="error-box">输出达到上限，以下解读可能不完整。</div>':''}<article class="report">${markdown(r.report)}</article>${usageView(r)}`:loading?'<div class="progress" role="status"><span class="spinner"></span>DeepSeek 正在解读这份盘面<p class="tiny">通常需要几十秒。你可以离开此页，结果会自动保存。</p></div>':`${r.error?`<div class="error-box">${escapeHTML(r.error)}<br><span class="tiny">失败或中断的请求可能已产生费用，本地无法取得该次用量。</span></div>`:''}<h3>让盘面，有一个新的视角。</h3><p class="muted">DeepSeek 将根据这份已保存的盘面，结合你的问题给出解读。</p>${config.hasKey?`<button class="button full" data-analyze="${r.id}">✧ ${r.status==='error'?'重试 DeepSeek 解读':'开始 DeepSeek 解读'}</button><p class="busy-note">解读将调用 DeepSeek API 并产生 token 费用</p>`:'<a class="button full" href="#/settings">先连接 DeepSeek →</a><p class="busy-note">盘面已保存在历史记录中，配置后可回来解读</p>'}`}</div><details class="details"><summary>查看完整排盘与抽取数据</summary><pre>${escapeHTML(JSON.stringify(r.chart,null,2))}</pre></details>`;
+  return `<div class="record-head"><div><div class="eyebrow">${m.en}</div><h2 class="serif">${escapeHTML(r.chart.title)}</h2><p>${dateLabel(r.createdAt)} · 规则 v${r.ruleVersion}</p></div><button class="button secondary" data-share="${r.id}" aria-label="分享盘面">分享 ↗</button></div>${chartView(r)}${r.input.question?`<div class="question-quote">${escapeHTML(r.input.question)}</div>`:''}<div class="rule-note"><strong>计算依据</strong><br>${escapeHTML(r.rules)}</div><div class="report-box">${r.report?`<div class="eyebrow">DEEPSEEK · 你的解读</div>${r.truncated?'<div class="error-box">输出达到上限，以下解读可能不完整。</div>':''}<article class="report">${markdown(focusedReport(r.report))}</article>${usageView(r)}`:loading?'<div class="progress" role="status"><span class="spinner"></span>DeepSeek 正在解读这份盘面<p class="tiny">通常需要几十秒。你可以离开此页，结果会自动保存。</p></div>':`${r.error?`<div class="error-box">${escapeHTML(r.error)}<br><span class="tiny">失败或中断的请求可能已产生费用，本地无法取得该次用量。</span></div>`:''}<h3>让盘面，有一个新的视角。</h3><p class="muted">DeepSeek 将根据这份已保存的盘面，结合你的问题给出解读。</p>${config.hasKey?`<button class="button full" data-analyze="${r.id}">✧ ${r.status==='error'?'重试 DeepSeek 解读':'开始 DeepSeek 解读'}</button><p class="busy-note">解读将调用 DeepSeek API 并产生 token 费用</p>`:'<a class="button full" href="#/settings">先连接 DeepSeek →</a><p class="busy-note">盘面已保存在历史记录中，配置后可回来解读</p>'}`}</div><details class="details"><summary>查看完整排盘与抽取数据</summary><pre>${escapeHTML(JSON.stringify(r.chart,null,2))}</pre></details>`;
 }
 async function renderRecord(id) {
   let r=records.find(r=>r.id===id);
   if(!r){try{r=await api('/readings/'+id);records.unshift(r);}catch(e){toast(e.message);location.hash='/history';return;}}
   if(route()!=='/record/'+id)return;
   const m=methods.find(m=>m.id===r.method);
-  shell(`<a href="#/history" class="back-link">← 返回历史记录</a><div class="page-intro">${methodIcon(m)}<div><h1>${m.name}探索</h1><p>一份盘面，一个观察自己的角度。</p></div></div><div class="workspace"><section class="panel"><h2>这次探索</h2><div class="rule-note">${escapeHTML(r.input.date?r.input.date+' '+r.input.time:r.method==='name'?r.chart.title:r.input.question)}</div><p class="tiny">创建于 ${dateLabel(r.createdAt)}<br>状态：${({complete:'解读已缓存',prepared:'盘面已保存',analyzing:'正在解读',error:'分析待重试'})[r.status]}<br>所有设备共享此本地工作室的历史记录。</p><a class="button secondary full" href="#/method/${m.id}">开始新的${m.name}探索 →</a><button class="button secondary full open-settings" data-export="${r.id}">导出完整记录 ↓</button><button class="button secondary full open-settings" data-delete="${r.id}" ${busy.has(r.id)||r.status==='analyzing'?'disabled':''}>删除这条记录</button></section><section class="panel" id="result-area">${recordContent(r)}</section></div>`,m.name,m.id);
+  shell(`<a href="#/history" class="back-link">← 返回历史记录</a><div class="page-intro">${methodIcon(m)}<div><h1>${m.name}探索</h1><p>一份盘面，一个观察自己的角度。</p></div></div><div class="workspace"><section class="panel"><h2>这次探索</h2><div class="rule-note">${escapeHTML(r.input.date?r.input.date+' '+r.input.time:r.method==='name'?r.chart.title:r.input.question)}</div><p class="tiny">创建于 ${dateLabel(r.createdAt)}<br>状态：${({complete:'解读已缓存',prepared:'盘面已保存',analyzing:'正在解读',error:'分析待重试'})[r.status]}<br>所有设备共享此本地工作室的历史记录。</p><a class="button secondary full" href="#/method/${m.id}">开始新的${m.name}探索 →</a><button class="button secondary full open-settings" data-share="${r.id}">分享盘面 ↗</button><button class="button secondary full open-settings" data-delete="${r.id}" ${busy.has(r.id)||r.status==='analyzing'?'disabled':''}>删除这条记录</button></section><section class="panel" id="result-area">${recordContent(r)}</section></div>`,m.name,m.id);
 }
-function renderHistory(){shell(`<div class="eyebrow">YOUR JOURNEY</div><h1 class="serif">每一次探索，都有迹可循。</h1><p class="muted">盘面、问题与解读，按时间留存在本地工作室。</p><div class="history-toolbar"><input id="history-search" type="search" placeholder="搜索问题、盘面或解读…" aria-label="搜索历史"><select id="history-method" aria-label="筛选方式"><option value="">所有方式</option>${methods.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select><button class="button secondary" data-action="export-all">导出</button></div><div class="recent-box" id="history-list">${records.length?records.map(item).join(''):'<div class="empty"><span class="empty-icon">◷</span>这里还没有故事。<a href="#/" class="text-link">开始第一次探索 →</a></div>'}</div><button id="history-more" class="button secondary open-settings" ${records.length<200?'hidden':''}>加载更多记录 ↓</button><p class="tiny">按时间分页查看。搜索覆盖全部存档，导出包含所有记录。</p>`,'历史记录','history');let timer,offset=records.length,revision=0;
+function renderHistory(){shell(`<div class="eyebrow">YOUR JOURNEY</div><h1 class="serif">每一次探索，都有迹可循。</h1><p class="muted">盘面、问题与解读，按时间留存在本地工作室。</p><div class="history-toolbar"><input id="history-search" type="search" placeholder="搜索问题、盘面或解读…" aria-label="搜索历史"><select id="history-method" aria-label="筛选方式"><option value="">所有方式</option>${methods.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select></div><div class="recent-box" id="history-list">${records.length?records.map(item).join(''):'<div class="empty"><span class="empty-icon">◷</span>这里还没有故事。<a href="#/" class="text-link">开始第一次探索 →</a></div>'}</div><button id="history-more" class="button secondary open-settings" ${records.length<200?'hidden':''}>加载更多记录 ↓</button><p class="tiny">按时间分页查看。搜索覆盖全部存档，打开单条记录即可分享盘面。</p>`,'历史记录','history');let timer,offset=records.length,revision=0;
   async function load(more=false){
     const search=$('#history-search'),method=$('#history-method'),button=$('#history-more');if(!search||!method||!button)return;
     const current=++revision;button.disabled=true;
@@ -158,7 +210,6 @@ function renderSettings() {
   form.elements.model.addEventListener('change',()=>{const pro=form.elements.model.value==='deepseek-v4-pro';for(const [name,value] of Object.entries(pro?{hit:.30,miss:9,output:27}:{hit:.04,miss:2,output:8}))form.elements[name].value=value;form.elements.label.value=`2026-10-14 官方 ${pro?'Pro':'Flash'} 高峰价估算（空闲时段通常减半）`;});
   form.addEventListener('submit',async e=>{e.preventDefault();const button=form.querySelector('[type=submit]');button.disabled=true;const data=Object.fromEntries(new FormData(form));const payload={model:data.model,pricing:{hit:Number(data.hit),miss:Number(data.miss),output:Number(data.output),label:data.label}};if(data.apiKey.trim())payload.apiKey=data.apiKey.trim();try{config=await api('/config',{method:'PUT',body:JSON.stringify(payload)});renderSettings();toast('设置已保存');}catch(e){toast(e.message);button.disabled=false;}});
 }
-function download(data,name) {const link=document.createElement('a');const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 async function deleteRecord(id) {
   const dialog=$('#confirm-dialog');if(dialog.open||deleting.has(id))return;
   const record=records.find(r=>r.id===id);if(busy.has(id)||record?.status==='analyzing'){toast('分析完成后可删除这条记录');return;}
@@ -205,21 +256,25 @@ async function boot() {
   }catch(e){startupError(e.message);}
 }
 document.addEventListener('click',async e=>{try{
-  const node=e.target.closest('[data-action],[data-filter],[data-analyze],[data-export],[data-delete]');if(!node)return;
+  const node=e.target.closest('[data-action],[data-filter],[data-analyze],[data-share],[data-delete]');if(!node)return;
   if(node.dataset.filter){filter=node.dataset.filter;renderHome();return;}
   if(node.dataset.analyze){analyzeRecord(node.dataset.analyze);return;}
-  if(node.dataset.export){const r=await api('/readings/'+node.dataset.export);download(r,'观象-'+r.method+'-'+r.id.slice(0,8)+'.json');return;}
+  if(node.dataset.share){openShare(node.dataset.share);return;}
   if(node.dataset.delete){deleteRecord(node.dataset.delete);return;}
   const action=node.dataset.action;
   if(action==='theme'){const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=theme;localStorage.setItem('gx-theme',theme);node.textContent=theme==='dark'?'☀':'☾';}
   if(action==='copy-lan')await copyLanUrl(node.dataset.url);
   if(action==='menu'){$('.sidebar')?.classList.toggle('open');$('.menu-scrim')?.classList.toggle('open');}
   if(action==='retry')await boot();
-  if(action==='export-all')download(await api('/readings/export'),'观象-历史记录.json');
+  if(action==='daily')await toggleDaily();
+  if(action==='save-share')await saveSharedPage();
+  if(action==='copy-share')await copyLanUrl($('#share-url').value,'分享链接已复制');
+  if(action==='close-share')$('#share-dialog').close();
   if(action==='clear-key'){try{config=await api('/config',{method:'PUT',body:JSON.stringify({apiKey:''})});renderSettings();toast(config.keyFromEnv?'本地密钥已清除，环境变量密钥仍有效':'本地密钥已清除');}catch(e){toast(e.message);}}
 }catch(error){toast(error.message);}});
+$('#share-dialog').addEventListener('close',()=>{shareRecord=null;lastFocus?.focus();});
 window.addEventListener('hashchange',()=>{if(methods.length)render();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('.sidebar')?.classList.remove('open');$('.menu-scrim')?.classList.remove('open');}});
 // Refresh records across LAN devices and recover long-running requests after navigation.
-setInterval(async()=>{if(!methods.length||document.hidden||busy.size)return;try{const fresh=await api('/readings');const current=route().split('/record/')[1];const changed=current&&JSON.stringify(records.find(r=>r.id===current))!==JSON.stringify(fresh.find(r=>r.id===current));records=fresh;if(changed&&current)renderRecord(current);}catch{/* A temporary connection failure is retried on the next refresh. */}},8000);
+setInterval(async()=>{if(!methods.length||document.hidden||busy.size)return;if(route()==='/'&&dailyOpen&&daily&&daily.date!==beijingDate())toggleDaily();try{const fresh=await api('/readings');const current=route().split('/record/')[1];const changed=current&&JSON.stringify(records.find(r=>r.id===current))!==JSON.stringify(fresh.find(r=>r.id===current));records=fresh;if(changed&&current)renderRecord(current);}catch{/* A temporary connection failure is retried on the next refresh. */}},8000);
 boot();

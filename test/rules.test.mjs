@@ -110,6 +110,8 @@ test('八种分析会加载对应Skill，HTTP与空输出失败不会伪造解�
   for(const method of ['bazi','ziwei','zodiac','tarot','poker','iching','lot','name']){
     const r=makeChart(method,{...birth,surname:'王',given:'知远',surnameStrokes:[4],givenStrokes:[8,17]});
     const messages=buildMessages(r);assert.equal(messages.length,2);assert.ok(messages[0].content.length>400);
+    assert.match(messages[0].content,/仅输出两个部分：## 关键信息解读、## 实践建议/);
+    assert.ok(!messages[0].content.includes('末尾说明子时规则'));
   }
   const r=makeChart('lot',{question:'方向'});const config={apiKey:'test-key',model:'deepseek-flash',pricing:{hit:.04,miss:2,output:8,currency:'CNY'}};
   await assert.rejects(analyze(r,{...config,apiKey:''}),/API Key/);

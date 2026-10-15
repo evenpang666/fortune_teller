@@ -6,9 +6,10 @@ import { randomUUID } from 'node:crypto';
 import { makeChart, lookupNameStrokes } from '../lib/rules.mjs';
 import { METHODS } from '../lib/methods.mjs';
 import { DEFAULT_CONFIG } from '../lib/store.mjs';
+import { dailyFortune } from '../lib/daily.mjs';
 
 async function until(check){for(let i=0;i<100;i++){if(check())return;await new Promise(resolve=>setTimeout(resolve,5));}throw new Error('页面状态未出现');}
-function fixture({url='http://localhost:3210/#/',key=false,initialRecords=[],deleteError=false,lookupImpl=lookupNameStrokes,network={available:true,urls:['http://192.168.124.62:4321'],reason:''}}={}){
+function fixture({url='http://localhost:3210/#/',key=false,initialRecords=[],deleteError=false,lookupImpl=lookupNameStrokes,dailyImpl=dailyFortune,network={available:true,urls:['http://192.168.124.62:4321'],reason:''}}={}){
   const dom=new JSDOM(readFileSync(new URL('../public/index.html',import.meta.url),'utf8'),{url,runScripts:'outside-only'});
   const w=dom.window;const saved=structuredClone(initialRecords);const requests=[];const operations=[];let settings={...DEFAULT_CONFIG,pricing:{...DEFAULT_CONFIG.pricing},apiKey:undefined,hasKey:key,network};
   w.matchMedia=()=>({matches:false});w.scrollTo=()=>{};
@@ -17,6 +18,8 @@ function fixture({url='http://localhost:3210/#/',key=false,initialRecords=[],del
   w.fetch=async(path,options={})=>{
     requests.push(path);
     operations.push({path,method:options.method||'GET'});
+    if(path==='/api/daily')return Response.json(await dailyImpl());
+    if(path==='/styles.css')return new Response(readFileSync(new URL('../public/styles.css',import.meta.url),'utf8'));
     if(path==='/api/name-strokes')return Response.json(await lookupImpl(JSON.parse(options.body)));
     if(path==='/api/methods')return Response.json(METHODS);
     if(path==='/api/config'){if(options.method==='PUT'){const data=JSON.parse(options.body);settings={...settings,...data,hasKey:!!data.apiKey||settings.hasKey,apiKey:undefined};}return Response.json(settings);}
@@ -31,6 +34,69 @@ function fixture({url='http://localhost:3210/#/',key=false,initialRecords=[],del
 }
 async function navigate(w,path,selector){w.location.hash=path;await until(()=>w.document.querySelector(selector));}
 function savedReading(question){return {...makeChart('lot',{question}),id:randomUUID(),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'prepared',report:null,usage:null,cost:null};}
+
+test('今日运势点击后加载，收起和再次展开复用当天结果',async()=>{
+  const {w,requests,close}=fixture();const d=w.document;
+  try{
+    await until(()=>d.querySelector('.daily-card'));
+    assert.equal(requests.includes('/api/daily'),false);assert.equal(d.querySelector('#daily-content').hidden,true);
+    d.querySelector('[data-action="daily"]').click();await until(()=>d.querySelector('.daily-assessment'));
+    assert.match(d.querySelector('.daily-calendar').textContent,/宜/);assert.match(d.querySelector('.daily-calendar').textContent,/忌/);
+    assert.equal(d.querySelector('[data-action="daily"]').getAttribute('aria-expanded'),'true');
+    d.querySelector('[data-action="daily"]').click();assert.equal(d.querySelector('#daily-content').hidden,true);
+    d.querySelector('[data-action="daily"]').click();await until(()=>d.querySelector('.daily-assessment'));
+    assert.equal(requests.filter(p=>p==='/api/daily').length,1);
+    assert.equal(requests.some(p=>p.includes('/analyze')),false);
+  }finally{close();}
+});
+
+test('今日运势读取失败可重试，离开主页后返回结果不会打断导航',async()=>{
+  let fail=true,resolve;
+  const {w,close}=fixture({dailyImpl:()=>fail?Promise.reject(new Error('黄历暂时不可用')):new Promise(r=>{resolve=r;})});const d=w.document;
+  try{
+    await until(()=>d.querySelector('.daily-card'));d.querySelector('[data-action="daily"]').click();
+    await until(()=>d.querySelector('#daily-content .error-box'));assert.equal(d.querySelector('[data-action="daily"]').disabled,false);
+    fail=false;d.querySelector('[data-action="daily"]').click();await until(()=>resolve);
+    await navigate(w,'/history','#history-list');resolve(dailyFortune());
+    await new Promise(r=>setTimeout(r,10));assert.ok(d.querySelector('#history-list'));
+    await navigate(w,'/','.daily-assessment');assert.equal(d.querySelector('#daily-content .error-box'),null);
+  }finally{close();}
+});
+
+test('旧解读隐藏摘要与局限，保留相关解读与实践建议',async()=>{
+  const r={...savedReading('精简解读'),status:'complete',report:'## 一、盘面摘要\n\n摘要内容\n\n### 次级摘要\n\n摘要细节\n\n## 二、与问题相关的解读\n\n关键解读内容\n\n## 三、具体可实践的建议\n\n- 保留这条建议\n\n## 四、规则与局限\n\n局限内容'};
+  const {w,close}=fixture({initialRecords:[r],url:'http://localhost:3210/#/record/'+r.id});
+  try{
+    await until(()=>w.document.querySelector('.report'));
+    const text=w.document.querySelector('.report').textContent;
+    assert.match(text,/关键解读内容/);assert.match(text,/保留这条建议/);assert.doesNotMatch(text,/摘要|局限/);
+    assert.equal(w.document.querySelector('[data-export]'),null);assert.ok(w.document.querySelector('[data-share]'));
+    // Older model responses also used bold, numbered section titles.
+    assert.equal(w.focusedReport('**1. 盘面摘要**\n\n删除\n\n**2. 关键信息解读**\n\n保留\n\n**3. 规则与局限**\n\n删除'),'**2. 关键信息解读**\n\n保留');
+  }finally{close();}
+});
+
+test('分享生成含盘面与解读的独立HTML，并复制局域网记录链接',async()=>{
+  const r={...savedReading('<img src=x onerror=alert(1)>'),status:'complete',report:'## 盘面摘要\n\n删除摘要\n\n## 关键信息解读\n\n保留解读<script>alert(1)</script>\n\n## 实践建议\n\n- 完成一件小事\n\n## 规则与局限\n\n删除局限'};
+  const {w,close}=fixture({initialRecords:[r],url:'http://localhost:3210/#/record/'+r.id});const d=w.document;
+  let blob,download,copied;w.Blob=Blob;w.URL.createObjectURL=value=>{blob=value;return 'blob:share';};w.URL.revokeObjectURL=()=>{};
+  w.HTMLAnchorElement.prototype.click=function(){download=this.download;};
+  Object.defineProperty(w.navigator,'clipboard',{value:{writeText:async text=>{copied=text;}}});
+  try{
+    await until(()=>d.querySelector('[data-share]'));const opener=d.querySelector('[data-share]');opener.focus();opener.click();
+    assert.equal(d.querySelector('#share-dialog').open,true);assert.equal(d.querySelector('#share-record-title img'),null);
+    d.querySelector('[data-action="copy-share"]').click();await until(()=>copied);assert.equal(copied,'http://192.168.124.62:4321/#/record/'+r.id);
+    d.querySelector('[data-action="save-share"]').click();await until(()=>blob);
+    assert.match(download,/\.html$/);assert.equal(blob.type,'text/html;charset=utf-8');
+    const html=await blob.text(),snapshot=new JSDOM(html),page=snapshot.window.document;
+    assert.ok(page.querySelector('style').textContent.includes('.shared-wrap'));assert.ok(page.querySelector('.lot-result'));
+    assert.match(page.querySelector('.report').textContent,/保留解读/);assert.match(page.querySelector('.report').textContent,/完成一件小事/);
+    assert.doesNotMatch(page.body.textContent,/删除摘要|删除局限/);assert.equal(page.querySelector('script,img,link,button,input,[data-share]'),null);
+    assert.equal(page.querySelector('meta[http-equiv]').content.includes("default-src 'none'"),true);snapshot.window.close();
+    d.querySelector('[data-action="close-share"]').click();assert.equal(d.querySelector('#share-dialog').open,false);assert.equal(d.activeElement,opener);
+    await navigate(w,'/history','#history-list');assert.equal(d.querySelector('[data-action="export-all"]'),null);
+  }finally{close();}
+});
 
 test('姓名输入后自动显示康熙笔画，无需手填即可提交并缓存来源',async()=>{
   const {w,saved,close}=fixture();const d=w.document;

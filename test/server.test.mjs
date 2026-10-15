@@ -22,7 +22,7 @@ test('姓名笔画查询无需AI且不新增历史，自动排盘记录保存实
   }finally{await app.close();rmSync(dir,{recursive:true,force:true});}
 });
 
-test('删除接口只移除指定记录及解读，历史和导出同步更新且重启后保持删除',async()=>{
+test('删除接口只移除指定记录及解读，历史同步更新且重启后保持删除',async()=>{
   const dir=mkdtempSync(join(tmpdir(),'gx-delete-'));const app=createApp({dataDir:dir});
   await new Promise(resolve=>app.server.listen(0,'127.0.0.1',resolve));const base=`http://127.0.0.1:${app.server.address().port}`;
   const create=async question=>(await fetch(base+'/api/readings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({method:'lot',input:{question}})})).json();
@@ -33,9 +33,21 @@ test('删除接口只移除指定记录及解读，历史和导出同步更新�
     assert.equal((await fetch(base+'/api/readings/'+target.id)).status,404);
     assert.equal((await fetch(base+'/api/readings/'+target.id+'/analyze',{method:'POST',body:'{}'})).status,404);
     const history=await(await fetch(base+'/api/readings')).json();assert.deepEqual(history.map(r=>r.id),[kept.id]);
-    const exported=await(await fetch(base+'/api/readings/export')).json();assert.deepEqual(exported.map(r=>r.id),[kept.id]);
+    assert.equal((await fetch(base+'/api/readings/export')).status,404);
     await app.close();const reopened=createStore(dir);assert.equal(reopened.get(target.id),null);assert.ok(reopened.get(kept.id));reopened.close();
   }finally{if(app.server.listening)await app.close();rmSync(dir,{recursive:true,force:true});}
+});
+
+test('今日黄历无需密钥或AI，不新增历史记录',async()=>{
+  const dir=mkdtempSync(join(tmpdir(),'gx-daily-'));
+  const app=createApp({dataDir:dir,analyzeImpl:async()=>{throw new Error('不应调用 AI');}});
+  await new Promise(resolve=>app.server.listen(0,'127.0.0.1',resolve));
+  try{
+    const response=await fetch(`http://127.0.0.1:${app.server.address().port}/api/daily`);
+    assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
+    const daily=await response.json();assert.equal(daily.timeZone,'Asia/Shanghai');assert.match(daily.date,/^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(daily.yi.length);assert.ok(daily.ji.length);assert.ok(daily.assessment.summary);assert.equal(app.store.list().length,0);
+  }finally{await app.close();rmSync(dir,{recursive:true,force:true});}
 });
 
 test('无需口令即可使用服务，历史持久化、分析缓存、密钥隐藏与来源校验有效',async()=>{
