@@ -2,7 +2,7 @@ import { EventEmitter } from 'node:events';
 import { registerBrowserLaunch,studioLaunchUrl,browserLaunchPath } from '../lib/browser-launch.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync,mkdirSync,writeFileSync,readFileSync,symlinkSync,rmSync,chmodSync,statSync,existsSync } from 'node:fs';
+import { mkdtempSync,mkdirSync,writeFileSync,readFileSync,copyFileSync,symlinkSync,rmSync,chmodSync,statSync,existsSync,realpathSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -53,11 +53,11 @@ test('已有 DSH 直接复用，即使旧更新开关开启也不查询 npm 或�
   }finally{rmSync(root,{recursive:true,force:true});}
 });
 
-test('DSH 缺失时提示使用已安装入口，不查询或安装 DSH',()=>{
+test('DSH 缺失时调用固定版本升级流程，安装失败则停止',()=>{
   const root=mkdtempSync(join(tmpdir(),'gx-missing-'));
   try{
     writeFileSync(join(root,'package.json'),JSON.stringify({dependencies:{}}));writeFileSync(join(root,'package-lock.json'),'{}');
-    assert.throws(()=>ensureEnvironment(root,{env:{PATH:'',DSH_HOME:join(root,'home')},exec:()=>assert.fail('不应自动安装'),spawnImpl:()=>assert.fail('不应查询 npm')}),/未找到已安装的 DSH/);
+    assert.throws(()=>ensureEnvironment(root,{env:{PATH:'',DSH_HOME:join(root,'home')},exec:()=>assert.fail('不应安装项目依赖'),spawnImpl:()=>assert.fail('不应查询 npm'),upgrade:options=>{assert.equal(options.version,undefined);assert.ok(options.npm);throw new Error('offline upgrade');}}),/offline upgrade/);
   }finally{rmSync(root,{recursive:true,force:true});}
 });
 
@@ -116,6 +116,26 @@ test('sh start.sh 与 bash start.sh 都可启动，保留工作目录和参数',
       const result=spawnSync(shell,[join(root,'start.sh'),'--no-open'],{cwd:temp,env:{...process.env,PATH:temp+':'+process.env.PATH},encoding:'utf8'});
       assert.equal(result.status,0,result.stderr);assert.equal(result.stderr,'');assert.deepEqual(result.stdout.trim().split('\n'),[root,'--disable-warning=UNDICI-EHPA','scripts/launch.mjs','--no-open']);
     }
+  }finally{rmSync(temp,{recursive:true,force:true});}
+});
+
+test('Windows 双击入口兼容 PowerShell 5.1，在中文空格路径中保留工作目录和参数',{skip:process.platform!=='win32'},()=>{
+  const temp=mkdtempSync(join(tmpdir(),'gx-windows-'));
+  const fixture=join(temp,'观象 launcher');
+  const root=fileURLToPath(new URL('../',import.meta.url));
+  try{
+    mkdirSync(join(fixture,'scripts'),{recursive:true});
+    for(const path of ['start.bat','scripts/bootstrap.ps1'])copyFileSync(join(root,path),join(fixture,path));
+    // Exercise the batch file and Windows PowerShell without installing or starting DSH.
+    writeFileSync(join(fixture,'scripts','launch.mjs'),"import { writeFileSync } from 'node:fs'; writeFileSync('invocation.json', JSON.stringify({ cwd: process.cwd(), args: process.argv.slice(2) }));");
+    const result=spawnSync(process.env.ComSpec||'cmd.exe',['/d','/s','/c',`""${join(fixture,'start.bat')}" --no-open "argument with spaces""`],{
+      cwd:temp,env:{...process.env,PATH:dirname(process.execPath)+';'+process.env.PATH},
+      encoding:'utf8',input:'',timeout:30000,windowsHide:true,windowsVerbatimArguments:true,
+    });
+    assert.equal(result.error,undefined);
+    assert.equal(result.status,0,result.stdout+'\n'+result.stderr);
+    assert.equal(result.stderr,'');
+    assert.deepEqual(JSON.parse(readFileSync(join(fixture,'invocation.json'),'utf8')),{cwd:fixture,args:['--no-open','argument with spaces']});
   }finally{rmSync(temp,{recursive:true,force:true});}
 });
 
@@ -179,8 +199,10 @@ test('统一使用 PATH 中的 DSH，而非项目或其他运行时的私有版�
   const root=mkdtempSync(join(tmpdir(),'gx-path-first-'));
   try{
     const global=join(root,'global','node_modules','@deepseek-ai','dsh');mkdirSync(join(global,'lib'),{recursive:true});writeFileSync(join(global,'package.json'),JSON.stringify({name:'@deepseek-ai/dsh',version:'0.2.0-rc.2'}));writeFileSync(join(global,'lib','bin.js'),'#!/usr/bin/env node\n');
-    const bin=join(root,'bin');mkdirSync(bin);symlinkSync(join(global,'lib','bin.js'),join(bin,'dsh'));
+    const bin=join(root,'bin');mkdirSync(bin);
+    if(process.platform==='win32'){symlinkSync(join(root,'global','node_modules'),join(bin,'node_modules'),'junction');writeFileSync(join(bin,'dsh.cmd'),'@echo off\r\n');}
+    else symlinkSync(join(global,'lib','bin.js'),join(bin,'dsh'));
     const other=join(root,'home','runtimes','private','current','node_modules','@deepseek-ai','dsh');mkdirSync(join(other,'lib'),{recursive:true});writeFileSync(join(other,'package.json'),JSON.stringify({name:'@deepseek-ai/dsh',version:'9.0.0'}));writeFileSync(join(other,'lib','bin.js'),'');
-    assert.equal(findDsh(root,{PATH:bin,DSH_HOME:join(root,'home')}).bin,join(global,'lib','bin.js'));
+    assert.equal(realpathSync(findDsh(root,{PATH:bin,DSH_HOME:join(root,'home')}).bin),realpathSync(join(global,'lib','bin.js')));
   }finally{rmSync(root,{recursive:true,force:true});}
 });

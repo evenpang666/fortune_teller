@@ -9,6 +9,7 @@
 | `UNDICI-EHPA` 实验提示 | 这是代理组件的实验性 warning，不代表加载失败；启动器仅过滤该提示，保留代理和其他错误日志 |
 | Node 缺失或版本低 | 使用 `sh start.sh`、`bash start.sh` 或 `start.bat`，自动安装到项目 `.data/node/` |
 | Node 下载失败 | 检查 `nodejs.org` 连接、curl/tar 或 PowerShell；也可手动安装 Node ≥22.13 |
+| Windows 双击提示字符串缺少终止符、缺少右花括号 | 更新 `scripts/bootstrap.ps1`；该脚本须保留 UTF-8 BOM，供 Windows PowerShell 5.1 正确读取中文 |
 | `Bad substitution` | 启动脚本已兼容 POSIX sh，直接重试 `sh ./start.sh` |
 | `ERR_PNPM_UNEXPECTED_STORE` | 新启动器读取共享 profile 的 pnpm 与 store 元数据，复用匹配版本；无需修改全局 store 或重装其他项目 |
 | npm / pnpm 安装失败 | 检查 registry、代理和项目 / DSH profile 写入权限；修复后重试，已有设置不会被清空 |
@@ -21,7 +22,7 @@
 | 解读提示缺失 Key 或认证失败 | 在 DSH Web 模型设置中配置凭据；观象无需单独填写 Key |
 | 模型与预期不一致 | 观象读取 DSH 的默认模型，请修改 DSH 默认选择；旧解读保留原模型 |
 | 解读超时或中断 | 检查 DSH 模型连接，在历史中重试；失败请求仍可能已被提供方计费 |
-| 未找到已安装的 DSH | 将已有 DSH 加入 PATH，或用 `DSH_CLI` 指定入口；启动器不查询更新或自动安装 DSH |
+| DSH 自动准备失败 | 检查网络与 `DSH_HOME` 写权限；也可用 `DSH_CLI` 指定满足 0.2.0-rc.2 最低版本的入口 |
 | 重复点击提示启动流程已在运行 | 原启动窗口仍在安装或运行；不会新开第二个 DSH |
 
 历史数据默认位于项目 `.data/`，升级前可备份。旧独立服务应先停止，避免与插件共同修改同一个数据库。

@@ -4,6 +4,7 @@ import { join, dirname, resolve, delimiter, basename } from 'node:path';
 import { homedir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { ensureDshVersion } from './dsh-version.mjs';
 
 export const MIN_NODE='22.13.0';
 const validVersion=value=>typeof value==='string'&&/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(value);
@@ -156,7 +157,7 @@ export function ensurePnpm(root,dsh,{env=process.env,exec=run,spawnImpl=spawnSyn
   console.log(`[环境] 复用 pnpm ${selected.version}${tools.storeDir?` · store ${tools.storeDir}`:''}`);
   return {pnpm:selected,env:childEnv};
 }
-export function ensureEnvironment(root,{env=process.env,exec=run,spawnImpl=spawnSync}={}) {
+export function ensureEnvironment(root,{env=process.env,exec=run,spawnImpl=spawnSync,upgrade=ensureDshVersion}={}) {
   if(!versionAtLeast(process.versions.node,MIN_NODE))throw new Error(`需要 Node.js >= ${MIN_NODE}，请使用 start.sh / start.bat 自动安装兼容版本。`);
   env={...env,PATH:[dirname(process.execPath),...pathDirectories(env)].join(delimiter)};
   const stateDir=join(root,'.data');mkdirSync(stateDir,{recursive:true});
@@ -173,8 +174,10 @@ export function ensureEnvironment(root,{env=process.env,exec=run,spawnImpl=spawn
   if(!dependenciesReady||(previous.fingerprint&&previous.fingerprint!==fingerprint)) {
     console.log('[环境] 安装或同步观象项目依赖…');exec('npm',['ci','--omit=dev','--no-audit','--no-fund'],{cwd:root,env});
   }
-  const dsh=findDsh(root,env);
-  if(!dsh)throw new Error('未找到已安装的 DSH。请先安装一次 DSH 并加入 PATH，或用 DSH_CLI 指定已有入口；启动器不会自动安装或升级 DSH。');
+  let dsh=findDsh(root,env);
+  const checked=upgrade({cli:dsh?.bin,version:dsh?.version,npm:npmInvocation([],env)[1][0],env,run:spawnImpl});
+  if(checked.cli!==dsh?.bin)dsh=packageAt(resolve(dirname(checked.cli),'..'));
+  if(!dsh)throw new Error('DSH 更新后无法读取安装信息。');
   console.log(`[环境] 复用 Node ${process.versions.node} · DSH ${dsh.version}\n[环境] DSH 入口：${dsh.bin}`);
   const pnpm=ensurePnpm(root,dsh,{env,exec,spawnImpl});
   writeFileSync(stamp,JSON.stringify({fingerprint},null,2));

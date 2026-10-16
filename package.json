@@ -8,13 +8,11 @@
   "exports": {
     ".": "./index.mjs",
     "./package.json": "./package.json",
-    "./client": "./client.js",
     "./locale/*.json": "./locale/*.json",
     "./icon": "./public/icon.svg"
   },
   "files": [
     "index.mjs",
-    "client.js",
     "cordis.patch.yml",
     "locale",
     "lib",
@@ -31,13 +29,6 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
-    },
-    "client": {
-      "platform": "web",
-      "immediately": true,
-      "inject": [
-        "@deepseek-ai/dsh-client-ui-conversation"
-      ]
     }
   },
   "engines": {

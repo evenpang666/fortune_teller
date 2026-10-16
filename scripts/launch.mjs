@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, openSync, closeSync, unlinkSync, readFileSync, w
 import { join, resolve } from 'node:path';
 import { studioLaunchUrl } from '../lib/browser-launch.mjs';
 import { ensureEnvironment, profileDirectory, pluginInstalled, run } from './environment.mjs';
+import { registrationCurrent, rememberRegistration } from './dsh-version.mjs';
 
 const root=resolve(fileURLToPath(new URL('../',import.meta.url)));
 export async function probeService(base,{fetchImpl=fetch}={}) {
@@ -103,7 +104,11 @@ export async function launch() {
     const runtime=ensureEnvironment(root);
     const {dsh}=runtime;const env=dshRuntimeEnvironment(runtime.env);
     const profile=profileDirectory(env);
-    if(!pluginInstalled(root,profile))run(process.execPath,[dsh.bin,'plugin','--profile','web','add',process.platform==='win32'?`"link:${root}"`:`link:${root}`],{cwd:root,env});
+    if(!pluginInstalled(root,profile)||!registrationCurrent(profile,'dsh-fortuneteller',dsh.version)) {
+      run(process.execPath,[dsh.bin,'plugin','--profile','web','add',`link:${root.replaceAll('\\','/')}`],{cwd:root,env});
+      if(!pluginInstalled(root,profile))throw new Error('DSH 未完成观象 bundle 注册。');
+      rememberRegistration(profile,'dsh-fortuneteller',dsh.version);
+    }
     if(existing){
       const active=await probeService(base);
       console.log(`[观象] 复用已有 DSH Web，DSH：${base}，未启动第二个 DSH 服务。`);

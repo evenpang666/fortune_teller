@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 Set-Location (Split-Path $PSScriptRoot -Parent)
 $nodeReady = $false
 if (Get-Command node -ErrorAction SilentlyContinue) {

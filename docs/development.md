@@ -13,7 +13,7 @@ npm run dev
 
 | 目录 / 文件 | 职责 |
 | --- | --- |
-| `index.mjs` / `client.js` | DSH Host 路由与原生 Slot 入口 |
+| `index.mjs` | DSH Host 路由、独立页面服务与 Skill 注册 |
 | `lib/dsh.mjs` | 宿主默认模型选择、流式生成、用量与错误映射 |
 | `lib/deepseek.mjs` | Skill 提示构造与费用计算，不直接请求提供方 |
 | `lib/server.mjs` | 可挂载 HTTP handler、排盘与历史接口 |

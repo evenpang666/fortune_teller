@@ -37,7 +37,7 @@ API Key、服务地址、模型提供方和默认模型均在 DSH Web 的模型�
 
 `sh start.sh`、`bash start.sh` / `start.bat` 优先使用当前可用 Node，必要时才使用项目内 Node。可自动补齐 Node.js ≥22.13，使用 Node 官方下载和 SHA-256 校验，安装到 `.data/node/`。系统原有 Node 保留。仅执行 `npm start` 时，Node 必须事先可用。
 
-项目依赖按 `package-lock.json` 同步，并检查 Node 版本变化和依赖是否缺失。DSH 首先使用 PATH 中已安装的入口；找不到时才尝试 `DSH_HOME/runtimes/*/current` 和相邻项目已有的安装。启动器只检查本机是否已有可运行的 DSH，不查询 npm 最新版，不自动安装、升级或切换到其他版本。找不到时提示先安装一次或设置 `DSH_CLI`。旧 `FORTUNE_AUTO_UPDATE` 开关不再生效。
+项目依赖按 `package-lock.json` 同步，并检查 Node 版本变化和依赖是否缺失。DSH 首先查找 PATH 和已有共享入口，再检查最低版本 0.2.0-rc.2。缺失或过低时，在 `$DSH_HOME/runtimes/web/versions/0.2.0-rc.2` 暂存安装、校验后切换；四个项目共用，失败保留原安装。DSH 版本变化后自动重新注册 Web 插件，成功才写入版本记录。符合要求时不查询 npm，也不降级新版。已有旧进程需要重启以加载新版；旧 `FORTUNE_AUTO_UPDATE` 开关不影响最低版本检查。
 
 pnpm 根据共享 profile 的 `node_modules/.modules.yaml` / `packageManager` 选择兼容版本，并沿用已有 `storeDir`。PATH 中旧 pnpm 不匹配时会继续寻找已有的匹配版本，只有确实缺失时才补齐指定版本，不强制降到 pnpm 10，也不修改全局 pnpm 配置或重建共享 `node_modules`。缺失组件与依赖修复需要网络。
 

@@ -2,7 +2,7 @@
 
 [返回首页](../README.md)
 
-插件 Bundle 包含 `package.json` 的 `dsh.bundle` / `dsh.client`、`cordis.patch.yml`、Host `index.mjs` 和浏览器入口 `client.js`。不修改 DSH 源码。
+插件 Bundle 包含 `package.json` 的 `dsh.bundle`、`cordis.patch.yml` 和 Host `index.mjs`。不修改 DSH 源码。
 
 ```bash
 dsh plugin --profile web add "link:/绝对路径/fortuneteller"
@@ -15,7 +15,7 @@ Host 依赖 `llm`、`agentDefaultModel`、`webServer`、`connection`。在 DSH W
 
 生成时读取 `agentDefaultModel.currentSelection()`，通过 `llm.stream()` 发送结构化盘面和对应 Skill，聚合可见文本、用量和结束状态。凭据、endpoint 和协议由 DSH 适配器处理；插件不读取或保存 DSH Key。DSH 中模型与凭据更新在下次请求生效。缺失凭据、限流、中断和不完整流均不会当作成功结果缓存。
 
-Client 在原生 `conversation.composer.dock` Slot 中提供相对路径 `/fortuneteller/` 的入口，无端口设置、iframe 或额外工作室监听。八个 Skill 通过 `skills` 服务注册。卸载时移除路由、终止进行中的生成、关闭数据库并注销 Skill，不会关闭 DSH Web。
+工作室通过下方的独立页面地址访问。八个 Skill 通过 `skills` 服务注册。卸载时移除路由、终止进行中的生成、关闭数据库并注销 Skill，不会关闭 DSH Web。
 
 数据目录默认是插件项目 `.data/`，可用 `FORTUNE_DATA_DIR` 或插件 `config.dataDir` 指定绝对路径。
 

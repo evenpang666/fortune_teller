@@ -1,0 +1,1111 @@
+## 首页
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 探索
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - paragraph: 给自己一点时间，听听内心的声音。
+  - text: A MOMENT OF CLARITY
+  - heading "观天地，照见自己。" [level=1]:
+    - text: 观天地，
+    - emphasis: 照见自己。
+  - paragraph: 古老的智慧，遇见新的视角。 从八字到塔罗，以 AI 为伴，探索属于你的人生叙事。
+  - text: ✧ 八种探索方式 ◷ 本地历史留存 ↗ DeepSeek 驱动
+  - region "今日运势":
+    - text: TODAY'S FORTUNE
+    - heading "今日运势" [level=2]
+    - paragraph: 看一眼黄历，为今天留一点从容。
+    - button "查看今日运势 →"
+  - heading "选择一种方式，开始探索" [level=2]
+  - paragraph: 每一种传统，都是认识自己的另一扇窗。
+  - button "全部" [pressed]
+  - button "东方命理"
+  - button "西方占星"
+  - button "卡牌占卜"
+  - region "命理方式":
+    - link "☯ 八字 Four Pillars 于四柱之间，读懂自己的节奏。 开启八字探索 ↗":
+      - /url: "#/method/bazi"
+      - text: ☯
+      - heading "八字" [level=3]
+      - text: Four Pillars
+      - paragraph: 于四柱之间，读懂自己的节奏。
+      - text: 开启八字探索 ↗
+    - link "✧ 星座 Astrology 循着星辰轨迹，探索内在宇宙。 开启星座探索 ↗":
+      - /url: "#/method/zodiac"
+      - text: ✧
+      - heading "星座" [level=3]
+      - text: Astrology
+      - paragraph: 循着星辰轨迹，探索内在宇宙。
+      - text: 开启星座探索 ↗
+    - link "☽ 塔罗 Tarot Reading 让每一张牌，回应此刻的疑问。 开启塔罗探索 ↗":
+      - /url: "#/method/tarot"
+      - text: ☽
+      - heading "塔罗" [level=3]
+      - text: Tarot Reading
+      - paragraph: 让每一张牌，回应此刻的疑问。
+      - text: 开启塔罗探索 ↗
+    - link "♧ 扑克 Cartomancy 熟悉的花色，藏着新的视角。 开启扑克探索 ↗":
+      - /url: "#/method/poker"
+      - text: ♧
+      - heading "扑克" [level=3]
+      - text: Cartomancy
+      - paragraph: 熟悉的花色，藏着新的视角。
+      - text: 开启扑克探索 ↗
+    - link "名 姓名 Name Reading 从名字出发，品读文字与寓意。 开启姓名探索 ↗":
+      - /url: "#/method/name"
+      - text: 名
+      - heading "姓名" [level=3]
+      - text: Name Reading
+      - paragraph: 从名字出发，品读文字与寓意。
+      - text: 开启姓名探索 ↗
+    - link "䷊ 易卦 I Ching 在变化之中，寻找前行的方向。 开启易卦探索 ↗":
+      - /url: "#/method/iching"
+      - text: ䷊
+      - heading "易卦" [level=3]
+      - text: I Ching
+      - paragraph: 在变化之中，寻找前行的方向。
+      - text: 开启易卦探索 ↗
+    - link "✺ 紫微斗数 Zi Wei Dou Shu 十二宫星曜，映照人生的不同侧面。 开启紫微斗数探索 ↗":
+      - /url: "#/method/ziwei"
+      - text: ✺
+      - heading "紫微斗数" [level=3]
+      - text: Zi Wei Dou Shu
+      - paragraph: 十二宫星曜，映照人生的不同侧面。
+      - text: 开启紫微斗数探索 ↗
+    - link "签 求签 Oracle Lots 静心片刻，收下一份当下的启示。 开启求签探索 ↗":
+      - /url: "#/method/lot"
+      - text: 签
+      - heading "求签" [level=3]
+      - text: Oracle Lots
+      - paragraph: 静心片刻，收下一份当下的启示。
+      - text: 开启求签探索 ↗
+  - heading "最近的探索" [level=2]
+  - paragraph: 每一次驻足，都值得被记住。
+  - link "全部记录 →":
+    - /url: "#/history"
+  - text: ◷ 故事，从你的第一次探索开始。 生成的盘面与解读会自动留存在这里 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## 手机导航
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 探索
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - paragraph: 给自己一点时间，听听内心的声音。
+  - text: A MOMENT OF CLARITY
+  - heading "观天地，照见自己。" [level=1]:
+    - text: 观天地，
+    - emphasis: 照见自己。
+  - paragraph: 古老的智慧，遇见新的视角。 从八字到塔罗，以 AI 为伴，探索属于你的人生叙事。
+  - text: ✧ 八种探索方式 ◷ 本地历史留存 ↗ DeepSeek 驱动
+  - region "今日运势":
+    - text: TODAY'S FORTUNE
+    - heading "今日运势" [level=2]
+    - paragraph: 看一眼黄历，为今天留一点从容。
+    - button "查看今日运势 →"
+  - heading "选择一种方式，开始探索" [level=2]
+  - paragraph: 每一种传统，都是认识自己的另一扇窗。
+  - button "全部" [pressed]
+  - button "东方命理"
+  - button "西方占星"
+  - button "卡牌占卜"
+  - region "命理方式":
+    - link "☯ 八字 Four Pillars 于四柱之间，读懂自己的节奏。 开启八字探索 ↗":
+      - /url: "#/method/bazi"
+      - text: ☯
+      - heading "八字" [level=3]
+      - text: Four Pillars
+      - paragraph: 于四柱之间，读懂自己的节奏。
+      - text: 开启八字探索 ↗
+    - link "✧ 星座 Astrology 循着星辰轨迹，探索内在宇宙。 开启星座探索 ↗":
+      - /url: "#/method/zodiac"
+      - text: ✧
+      - heading "星座" [level=3]
+      - text: Astrology
+      - paragraph: 循着星辰轨迹，探索内在宇宙。
+      - text: 开启星座探索 ↗
+    - link "☽ 塔罗 Tarot Reading 让每一张牌，回应此刻的疑问。 开启塔罗探索 ↗":
+      - /url: "#/method/tarot"
+      - text: ☽
+      - heading "塔罗" [level=3]
+      - text: Tarot Reading
+      - paragraph: 让每一张牌，回应此刻的疑问。
+      - text: 开启塔罗探索 ↗
+    - link "♧ 扑克 Cartomancy 熟悉的花色，藏着新的视角。 开启扑克探索 ↗":
+      - /url: "#/method/poker"
+      - text: ♧
+      - heading "扑克" [level=3]
+      - text: Cartomancy
+      - paragraph: 熟悉的花色，藏着新的视角。
+      - text: 开启扑克探索 ↗
+    - link "名 姓名 Name Reading 从名字出发，品读文字与寓意。 开启姓名探索 ↗":
+      - /url: "#/method/name"
+      - text: 名
+      - heading "姓名" [level=3]
+      - text: Name Reading
+      - paragraph: 从名字出发，品读文字与寓意。
+      - text: 开启姓名探索 ↗
+    - link "䷊ 易卦 I Ching 在变化之中，寻找前行的方向。 开启易卦探索 ↗":
+      - /url: "#/method/iching"
+      - text: ䷊
+      - heading "易卦" [level=3]
+      - text: I Ching
+      - paragraph: 在变化之中，寻找前行的方向。
+      - text: 开启易卦探索 ↗
+    - link "✺ 紫微斗数 Zi Wei Dou Shu 十二宫星曜，映照人生的不同侧面。 开启紫微斗数探索 ↗":
+      - /url: "#/method/ziwei"
+      - text: ✺
+      - heading "紫微斗数" [level=3]
+      - text: Zi Wei Dou Shu
+      - paragraph: 十二宫星曜，映照人生的不同侧面。
+      - text: 开启紫微斗数探索 ↗
+    - link "签 求签 Oracle Lots 静心片刻，收下一份当下的启示。 开启求签探索 ↗":
+      - /url: "#/method/lot"
+      - text: 签
+      - heading "求签" [level=3]
+      - text: Oracle Lots
+      - paragraph: 静心片刻，收下一份当下的启示。
+      - text: 开启求签探索 ↗
+  - heading "最近的探索" [level=2]
+  - paragraph: 每一次驻足，都值得被记住。
+  - link "全部记录 →":
+    - /url: "#/history"
+  - text: ◷ 故事，从你的第一次探索开始。 生成的盘面与解读会自动留存在这里 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## 今日运势
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 探索
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - paragraph: 给自己一点时间，听听内心的声音。
+  - text: A MOMENT OF CLARITY
+  - heading "观天地，照见自己。" [level=1]:
+    - text: 观天地，
+    - emphasis: 照见自己。
+  - paragraph: 古老的智慧，遇见新的视角。 从八字到塔罗，以 AI 为伴，探索属于你的人生叙事。
+  - text: ✧ 八种探索方式 ◷ 本地历史留存 ↗ DeepSeek 驱动
+  - region "今日运势":
+    - text: TODAY'S FORTUNE
+    - heading "今日运势" [level=2]
+    - paragraph: 看一眼黄历，为今天留一点从容。
+    - button "收起 ↑" [expanded]
+    - paragraph: 2026-10-16 · 星期五
+    - heading "丙午年 九月初七" [level=3]
+    - paragraph: 戊戌月 · 癸亥日
+    - text: 宜
+    - paragraph: 祭祀 · 开光 · 出行 · 解除 · 理发 · 伐木
+    - text: 忌
+    - paragraph: 嫁娶 · 安葬 · 行丧 · 词讼 · 造桥 · 作灶
+    - text: 从容推进
+    - paragraph: 适合按计划推进手头事务，沟通时把想法说清楚。
+    - strong: 今日建议
+    - paragraph: 选一件重要的小事，今天完成它。
+    - text: 值神 玉堂 · 吉
+    - paragraph: 按北京时间更新；运势参考黄历值神吉凶，仅供民俗文化参考。
+  - heading "选择一种方式，开始探索" [level=2]
+  - paragraph: 每一种传统，都是认识自己的另一扇窗。
+  - button "全部" [pressed]
+  - button "东方命理"
+  - button "西方占星"
+  - button "卡牌占卜"
+  - region "命理方式":
+    - link "☯ 八字 Four Pillars 于四柱之间，读懂自己的节奏。 开启八字探索 ↗":
+      - /url: "#/method/bazi"
+      - text: ☯
+      - heading "八字" [level=3]
+      - text: Four Pillars
+      - paragraph: 于四柱之间，读懂自己的节奏。
+      - text: 开启八字探索 ↗
+    - link "✧ 星座 Astrology 循着星辰轨迹，探索内在宇宙。 开启星座探索 ↗":
+      - /url: "#/method/zodiac"
+      - text: ✧
+      - heading "星座" [level=3]
+      - text: Astrology
+      - paragraph: 循着星辰轨迹，探索内在宇宙。
+      - text: 开启星座探索 ↗
+    - link "☽ 塔罗 Tarot Reading 让每一张牌，回应此刻的疑问。 开启塔罗探索 ↗":
+      - /url: "#/method/tarot"
+      - text: ☽
+      - heading "塔罗" [level=3]
+      - text: Tarot Reading
+      - paragraph: 让每一张牌，回应此刻的疑问。
+      - text: 开启塔罗探索 ↗
+    - link "♧ 扑克 Cartomancy 熟悉的花色，藏着新的视角。 开启扑克探索 ↗":
+      - /url: "#/method/poker"
+      - text: ♧
+      - heading "扑克" [level=3]
+      - text: Cartomancy
+      - paragraph: 熟悉的花色，藏着新的视角。
+      - text: 开启扑克探索 ↗
+    - link "名 姓名 Name Reading 从名字出发，品读文字与寓意。 开启姓名探索 ↗":
+      - /url: "#/method/name"
+      - text: 名
+      - heading "姓名" [level=3]
+      - text: Name Reading
+      - paragraph: 从名字出发，品读文字与寓意。
+      - text: 开启姓名探索 ↗
+    - link "䷊ 易卦 I Ching 在变化之中，寻找前行的方向。 开启易卦探索 ↗":
+      - /url: "#/method/iching"
+      - text: ䷊
+      - heading "易卦" [level=3]
+      - text: I Ching
+      - paragraph: 在变化之中，寻找前行的方向。
+      - text: 开启易卦探索 ↗
+    - link "✺ 紫微斗数 Zi Wei Dou Shu 十二宫星曜，映照人生的不同侧面。 开启紫微斗数探索 ↗":
+      - /url: "#/method/ziwei"
+      - text: ✺
+      - heading "紫微斗数" [level=3]
+      - text: Zi Wei Dou Shu
+      - paragraph: 十二宫星曜，映照人生的不同侧面。
+      - text: 开启紫微斗数探索 ↗
+    - link "签 求签 Oracle Lots 静心片刻，收下一份当下的启示。 开启求签探索 ↗":
+      - /url: "#/method/lot"
+      - text: 签
+      - heading "求签" [level=3]
+      - text: Oracle Lots
+      - paragraph: 静心片刻，收下一份当下的启示。
+      - text: 开启求签探索 ↗
+  - heading "最近的探索" [level=2]
+  - paragraph: 每一次驻足，都值得被记住。
+  - link "全部记录 →":
+    - /url: "#/history"
+  - text: ◷ 故事，从你的第一次探索开始。 生成的盘面与解读会自动留存在这里 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## tarot表单
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 塔罗
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - link "← 返回探索":
+    - /url: "#/"
+  - text: ☽
+  - heading "塔罗" [level=1]
+  - paragraph: 让每一张牌，回应此刻的疑问。
+  - heading "准备你的问题" [level=2]
+  - text: 选择牌阵
+  - combobox "选择牌阵":
+    - option "三张牌 · 过去 / 现在 / 未来趋势" [selected]
+    - option "单张牌 · 当下的启示"
+    - option "选择牌阵 · A / B / 需要留意"
+  - checkbox "启用正逆位" [checked]
+  - text: 启用正逆位 此刻，你想探索什么？
+  - textbox "此刻，你想探索什么？":
+    - /placeholder: 例如：如何更好地面对工作中的新变化？
+  - button "洗牌与抽牌 →"
+  - paragraph: 本地计算，不消耗 AI tokens
+  - strong: 本次采用的规则
+  - text: Rider–Waite–Smith · 78 张完整牌组 · 不放回抽取 · 可选正逆位
+  - group: 关于这一体系
+  - text: ☽
+  - heading "从一个问题，一份好奇开始。" [level=3]
+  - paragraph: 填写左侧信息，生成你的盘面。 再让 DeepSeek 为它带来新的解读。
+  - text: 生成结果会自动保存到历史记录 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## 盘面结果
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录 1":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 塔罗
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - link "← 返回历史记录":
+    - /url: "#/history"
+  - text: ☽
+  - heading "塔罗探索" [level=1]
+  - paragraph: 一份盘面，一个观察自己的角度。
+  - heading "这次探索" [level=2]
+  - text: 面对新机会，我该如何迈出第一步？
+  - paragraph: 创建于 2026/10/16 01:04:23 状态：盘面已保存 所有设备共享此本地工作室的历史记录。
+  - link "开始新的塔罗探索 →":
+    - /url: "#/method/tarot"
+  - button "分享盘面 ↗"
+  - button "删除这条记录"
+  - text: Tarot Reading
+  - heading "命运之轮 · 宝剑七 · 星币国王" [level=2]
+  - paragraph: 2026/10/16 01:04:23 · 规则 v1.0.0
+  - button "分享盘面": 分享 ↗
+  - text: MAJOR ARCANA ☽
+  - strong: 命运之轮
+  - text: 逆位
+  - paragraph: 过去
+  - text: MINOR ARCANA ✧
+  - strong: 宝剑七
+  - text: 正位
+  - paragraph: 现在
+  - text: MINOR ARCANA ☀
+  - strong: 星币国王
+  - text: 正位
+  - paragraph: 未来趋势
+  - text: 面对新机会，我该如何迈出第一步？
+  - strong: 计算依据
+  - text: Rider–Waite–Smith · 78 张完整牌组 · 不放回抽取 · 可选正逆位
+  - heading "让盘面，有一个新的视角。" [level=3]
+  - paragraph: DeepSeek 将根据这份已保存的盘面，结合你的问题给出解读。
+  - link "先连接 DeepSeek →":
+    - /url: "#/settings"
+  - paragraph: 盘面已保存在历史记录中，配置后可回来解读
+  - group: 查看完整排盘与抽取数据
+  - text: 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## bazi表单
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录 1":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 八字
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - link "← 返回探索":
+    - /url: "#/"
+  - text: ☯
+  - heading "八字" [level=1]
+  - paragraph: 于四柱之间，读懂自己的节奏。
+  - heading "准备你的信息" [level=2]
+  - text: 公历出生日期
+  - textbox "公历出生日期"
+  - text: 出生时间
+  - textbox "出生时间"
+  - text: 传统排盘性别
+  - combobox "传统排盘性别 仅用于传统排盘与大运顺逆计算。":
+    - option "女" [selected]
+    - option "男"
+  - text: 仅用于传统排盘与大运顺逆计算。
+  - paragraph: 填写北京时间（UTC+8）；海外出生请先换算。当前采用钟表时间，未校正真太阳时。
+  - text: 子时换日规则
+  - combobox "子时换日规则":
+    - option "午夜 00:00 换日（晚子时日柱不换）" [selected]
+    - option "晚子时 23:00 换日"
+  - text: 想重点探索的方向（选填）
+  - textbox "想重点探索的方向（选填）":
+    - /placeholder: 例如：如何更好地面对工作中的新变化？
+  - button "生成四柱 →"
+  - paragraph: 本地计算，不消耗 AI tokens
+  - strong: 本次采用的规则
+  - text: 子平四柱 · 立春换年 · 节令换月 · 北京时间 · 子时换日可选
+  - group: 关于这一体系
+  - text: ☯
+  - heading "从一个问题，一份好奇开始。" [level=3]
+  - paragraph: 填写左侧信息，生成你的盘面。 再让 DeepSeek 为它带来新的解读。
+  - text: 生成结果会自动保存到历史记录 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## 盘面结果
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录 2":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 八字
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - link "← 返回历史记录":
+    - /url: "#/history"
+  - text: ☯
+  - heading "八字探索" [level=1]
+  - paragraph: 一份盘面，一个观察自己的角度。
+  - heading "这次探索" [level=2]
+  - text: 1998-06-15 09:30
+  - paragraph: 创建于 2026/10/16 01:04:23 状态：盘面已保存 所有设备共享此本地工作室的历史记录。
+  - link "开始新的八字探索 →":
+    - /url: "#/method/bazi"
+  - button "分享盘面 ↗"
+  - button "删除这条记录"
+  - text: Four Pillars
+  - heading "戊寅 · 戊午 · 癸巳 · 丁巳" [level=2]
+  - paragraph: 2026/10/16 01:04:23 · 规则 v1.0.0
+  - button "分享盘面": 分享 ↗
+  - text: 年柱 戊寅 土木 正官 城头土 月柱 戊午 土火 正官 天上火 日柱 癸巳 水火 日主 长流水 时柱 丁巳 火火 偏财 沙中土
+  - paragraph: 日主 癸 · 一九九八年五月廿一 起运日期 2001-07-06 · 北京时间 UTC+8，未校正真太阳时
+  - text: 丁巳 4–13岁 丙辰 14–23岁 乙卯 24–33岁 甲寅 34–43岁 癸丑 44–53岁 壬子 54–63岁 辛亥 64–73岁 庚戌 74–83岁 如何找到适合自己的工作节奏？
+  - strong: 计算依据
+  - text: 子平四柱 · 立春换年 · 节令换月 · 北京时间 · 子时换日可选
+  - heading "让盘面，有一个新的视角。" [level=3]
+  - paragraph: DeepSeek 将根据这份已保存的盘面，结合你的问题给出解读。
+  - link "先连接 DeepSeek →":
+    - /url: "#/settings"
+  - paragraph: 盘面已保存在历史记录中，配置后可回来解读
+  - group: 查看完整排盘与抽取数据
+  - text: 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## name表单
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录 2":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 姓名
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - link "← 返回探索":
+    - /url: "#/"
+  - text: 名
+  - heading "姓名" [level=1]
+  - paragraph: 从名字出发，品读文字与寓意。
+  - heading "准备你的信息" [level=2]
+  - text: 姓氏
+  - textbox "姓氏":
+    - /placeholder: 例如：王 / 欧阳
+  - text: 名字
+  - textbox "名字":
+    - /placeholder: 例如：知远
+  - status: 输入姓氏与名字后，自动查询康熙笔画。
+  - checkbox "手动核实 / 调整笔画"
+  - text: 手动核实 / 调整笔画 姓氏康熙笔画
+  - textbox "姓氏康熙笔画 按姓氏字序排列；手动模式用逗号分隔。":
+    - /placeholder: 自动查询
+  - text: 按姓氏字序排列；手动模式用逗号分隔。 名字康熙笔画
+  - textbox "名字康熙笔画 采用姓名学康熙笔画口径，非现代简体笔画。":
+    - /placeholder: 自动查询
+  - text: 采用姓名学康熙笔画口径，非现代简体笔画。
+  - button "重新自动查询笔画 ↻"
+  - text: 想重点探索的方向（选填）
+  - textbox "想重点探索的方向（选填）":
+    - /placeholder: 例如：如何更好地面对工作中的新变化？
+  - button "解析姓名 →"
+  - paragraph: 本地计算，不消耗 AI tokens
+  - strong: 本次采用的规则
+  - text: 五格剖象法 · 离线查询姓名学康熙笔画 · 支持单姓与复姓 · 可手动核实调整
+  - group: 关于这一体系
+  - text: 名
+  - heading "从一个问题，一份好奇开始。" [level=3]
+  - paragraph: 填写左侧信息，生成你的盘面。 再让 DeepSeek 为它带来新的解读。
+  - text: 生成结果会自动保存到历史记录 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## 姓名自动笔画
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录 2":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 姓名
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - link "← 返回探索":
+    - /url: "#/"
+  - text: 名
+  - heading "姓名" [level=1]
+  - paragraph: 从名字出发，品读文字与寓意。
+  - heading "准备你的信息" [level=2]
+  - text: 姓氏
+  - textbox "姓氏":
+    - /placeholder: 例如：王 / 欧阳
+    - text: 林
+  - text: 名字
+  - textbox "名字":
+    - /placeholder: 例如：知远
+    - text: 知夏
+  - status:
+    - text: 林：8 画 知：8 画 夏：10 画
+    - paragraph: 已查询到全部笔画；可勾选手动调整进行核实。
+    - text: 离线字典 · 姓名学康熙笔画口径
+  - checkbox "手动核实 / 调整笔画"
+  - text: 手动核实 / 调整笔画 姓氏康熙笔画
+  - textbox "姓氏康熙笔画 按姓氏字序排列；手动模式用逗号分隔。":
+    - /placeholder: 自动查询
+    - text: "8"
+  - text: 按姓氏字序排列；手动模式用逗号分隔。 名字康熙笔画
+  - textbox "名字康熙笔画 采用姓名学康熙笔画口径，非现代简体笔画。":
+    - /placeholder: 自动查询
+    - text: 8, 10
+  - text: 采用姓名学康熙笔画口径，非现代简体笔画。
+  - button "重新自动查询笔画 ↻"
+  - text: 想重点探索的方向（选填）
+  - textbox "想重点探索的方向（选填）":
+    - /placeholder: 例如：如何更好地面对工作中的新变化？
+  - button "解析姓名 →"
+  - paragraph: 本地计算，不消耗 AI tokens
+  - strong: 本次采用的规则
+  - text: 五格剖象法 · 离线查询姓名学康熙笔画 · 支持单姓与复姓 · 可手动核实调整
+  - group: 关于这一体系
+  - text: 名
+  - heading "从一个问题，一份好奇开始。" [level=3]
+  - paragraph: 填写左侧信息，生成你的盘面。 再让 DeepSeek 为它带来新的解读。
+  - text: 生成结果会自动保存到历史记录 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## 盘面结果
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录 3":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 姓名
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - link "← 返回历史记录":
+    - /url: "#/history"
+  - text: 名
+  - heading "姓名探索" [level=1]
+  - paragraph: 一份盘面，一个观察自己的角度。
+  - heading "这次探索" [level=2]
+  - text: 林知夏
+  - paragraph: 创建于 2026/10/16 01:04:24 状态：盘面已保存 所有设备共享此本地工作室的历史记录。
+  - link "开始新的姓名探索 →":
+    - /url: "#/method/name"
+  - button "分享盘面 ↗"
+  - button "删除这条记录"
+  - text: Name Reading
+  - heading "林知夏" [level=2]
+  - paragraph: 2026/10/16 01:04:24 · 规则 v1.1.0
+  - button "分享盘面": 分享 ↗
+  - text: 天格
+  - strong: "9"
+  - text: 水 人格
+  - strong: "16"
+  - text: 土 地格
+  - strong: "18"
+  - text: 金 外格
+  - strong: "11"
+  - text: 木 总格
+  - strong: "26"
+  - text: 土
+  - paragraph: 三才 水 · 土 · 金 林 8 画 · 知 8 画 · 夏 10 画 离线字典 · 姓名学康熙笔画口径（shunshi-kangxi-core 0.1.1）
+  - text: 从名字中发现一点新意。
+  - strong: 计算依据
+  - text: 五格剖象法 · 离线查询姓名学康熙笔画 · 支持单姓与复姓 · 可手动核实调整
+  - heading "让盘面，有一个新的视角。" [level=3]
+  - paragraph: DeepSeek 将根据这份已保存的盘面，结合你的问题给出解读。
+  - link "先连接 DeepSeek →":
+    - /url: "#/settings"
+  - paragraph: 盘面已保存在历史记录中，配置后可回来解读
+  - group: 查看完整排盘与抽取数据
+  - text: 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## iching表单
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录 3":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 易卦
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - link "← 返回探索":
+    - /url: "#/"
+  - text: ䷊
+  - heading "易卦" [level=1]
+  - paragraph: 在变化之中，寻找前行的方向。
+  - heading "准备你的信息" [level=2]
+  - paragraph: 程序依次投掷三枚铜钱六次，保留每次点数。初爻在下，上爻在上；6 与 9 为变爻。
+  - text: 此刻，你想探索什么？
+  - textbox "此刻，你想探索什么？":
+    - /placeholder: 例如：如何更好地面对工作中的新变化？
+  - button "投币起卦 →"
+  - paragraph: 本地计算，不消耗 AI tokens
+  - strong: 本次采用的规则
+  - text: 三枚铜钱法 · 阴面 2 阳面 3 · 六爻自下而上 · 老阴老阳变爻
+  - group: 关于这一体系
+  - text: ䷊
+  - heading "从一个问题，一份好奇开始。" [level=3]
+  - paragraph: 填写左侧信息，生成你的盘面。 再让 DeepSeek 为它带来新的解读。
+  - text: 生成结果会自动保存到历史记录 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## 盘面结果
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录 4":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 易卦
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - link "← 返回历史记录":
+    - /url: "#/history"
+  - text: ䷊
+  - heading "易卦探索" [level=1]
+  - paragraph: 一份盘面，一个观察自己的角度。
+  - heading "这次探索" [level=2]
+  - text: 怎样更从容地应对接下来的变化？
+  - paragraph: 创建于 2026/10/16 01:04:24 状态：盘面已保存 所有设备共享此本地工作室的历史记录。
+  - link "开始新的易卦探索 →":
+    - /url: "#/method/iching"
+  - button "分享盘面 ↗"
+  - button "删除这条记录"
+  - text: I Ching
+  - heading "同人之贲" [level=2]
+  - paragraph: 2026/10/16 01:04:24 · 规则 v1.0.0
+  - button "分享盘面": 分享 ↗
+  - text: 同人 ䷌ 7 8 7 9 ◦ 9 ◦ 7 天上 · 火下 · 第 13 卦 贲 ䷕ 1 2 3 4 5 6 山上 · 火下 · 第 22 卦
+  - paragraph: 本卦 → 变卦 · 变爻：第 4、5 爻 · 铜钱原始值自下而上：7 / 8 / 7 / 9 / 9 / 7
+  - text: 怎样更从容地应对接下来的变化？
+  - strong: 计算依据
+  - text: 三枚铜钱法 · 阴面 2 阳面 3 · 六爻自下而上 · 老阴老阳变爻
+  - heading "让盘面，有一个新的视角。" [level=3]
+  - paragraph: DeepSeek 将根据这份已保存的盘面，结合你的问题给出解读。
+  - link "先连接 DeepSeek →":
+    - /url: "#/settings"
+  - paragraph: 盘面已保存在历史记录中，配置后可回来解读
+  - group: 查看完整排盘与抽取数据
+  - text: 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
+
+## 历史记录
+- complementary:
+  - link "观象 GUANXIANG · AI STUDIO":
+    - /url: "#/"
+    - strong: 观象
+    - text: GUANXIANG · AI STUDIO
+  - navigation "主导航":
+    - paragraph: 你的探索空间
+    - link "◈ 探索":
+      - /url: "#/"
+    - link "◷ 历史记录 4":
+      - /url: "#/history"
+    - paragraph: 命理与占卜
+    - link "☯ 八字":
+      - /url: "#/method/bazi"
+    - link "✧ 星座":
+      - /url: "#/method/zodiac"
+    - link "☽ 塔罗":
+      - /url: "#/method/tarot"
+    - link "♧ 扑克":
+      - /url: "#/method/poker"
+    - link "名 姓名":
+      - /url: "#/method/name"
+    - link "䷊ 易卦":
+      - /url: "#/method/iching"
+    - link "✺ 紫微斗数":
+      - /url: "#/method/ziwei"
+    - link "签 求签":
+      - /url: "#/method/lot"
+  - link "⚙ 设置与连接":
+    - /url: "#/settings"
+  - text: 本地工作室 让好奇有方向，让生活有回响。
+- main:
+  - button "展开导航": ☰
+  - text: / 历史记录
+  - button "切换浅色或深色主题": ☾
+  - complementary "局域网访问":
+    - strong: 局域网访问
+    - paragraph: 当前服务仅监听本机，局域网访问未开启。
+  - text: YOUR JOURNEY
+  - heading "每一次探索，都有迹可循。" [level=1]
+  - paragraph: 盘面、问题与解读，按时间留存在本地工作室。
+  - searchbox "搜索历史"
+  - combobox "筛选方式":
+    - option "所有方式" [selected]
+    - option "八字"
+    - option "星座"
+    - option "塔罗"
+    - option "扑克"
+    - option "姓名"
+    - option "易卦"
+    - option "紫微斗数"
+    - option "求签"
+  - link "䷊ 怎样更从容地应对接下来的变化？ 易卦 · 2026/10/16 01:04:24 已排盘 本地记录 ↗":
+    - /url: "#/record/35aed75a-133e-4efd-93bd-132e5ff8acc2"
+    - text: ䷊
+    - heading "怎样更从容地应对接下来的变化？" [level=3]
+    - paragraph: 易卦 · 2026/10/16 01:04:24
+    - text: 已排盘 本地记录 ↗
+  - button "删除易卦记录：怎样更从容地应对接下来的变化？": 删除
+  - link "名 从名字中发现一点新意。 姓名 · 2026/10/16 01:04:24 已排盘 本地记录 ↗":
+    - /url: "#/record/283a6cab-15b4-4fed-a6c9-b8596f4b0689"
+    - text: 名
+    - heading "从名字中发现一点新意。" [level=3]
+    - paragraph: 姓名 · 2026/10/16 01:04:24
+    - text: 已排盘 本地记录 ↗
+  - button "删除姓名记录：从名字中发现一点新意。": 删除
+  - link "☯ 如何找到适合自己的工作节奏？ 八字 · 2026/10/16 01:04:23 已排盘 本地记录 ↗":
+    - /url: "#/record/a69b83e1-e4c7-479d-b056-72a56bef1ea1"
+    - text: ☯
+    - heading "如何找到适合自己的工作节奏？" [level=3]
+    - paragraph: 八字 · 2026/10/16 01:04:23
+    - text: 已排盘 本地记录 ↗
+  - button "删除八字记录：如何找到适合自己的工作节奏？": 删除
+  - link "☽ 面对新机会，我该如何迈出第一步？ 塔罗 · 2026/10/16 01:04:23 已排盘 本地记录 ↗":
+    - /url: "#/record/fb16ff4b-65fc-4ea6-b9d8-403264747d10"
+    - text: ☽
+    - heading "面对新机会，我该如何迈出第一步？" [level=3]
+    - paragraph: 塔罗 · 2026/10/16 01:04:23
+    - text: 已排盘 本地记录 ↗
+  - button "删除塔罗记录：面对新机会，我该如何迈出第一步？": 删除
+  - paragraph: 按时间分页查看。搜索覆盖全部存档，打开单条记录即可分享盘面。
+  - text: 观象 · 以传统文化与 AI，探索更多可能 文化探索与自我反思参考 · 解读不代表确定的未来
+- status
