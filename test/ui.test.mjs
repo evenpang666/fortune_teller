@@ -9,14 +9,15 @@ import { DEFAULT_CONFIG } from '../lib/store.mjs';
 import { dailyFortune } from '../lib/daily.mjs';
 
 async function until(check){for(let i=0;i<100;i++){if(check())return;await new Promise(resolve=>setTimeout(resolve,5));}throw new Error('页面状态未出现');}
-function fixture({url='http://localhost:3210/#/',key=false,initialRecords=[],deleteError=false,lookupImpl=lookupNameStrokes,dailyImpl=dailyFortune,network={available:true,urls:['http://192.168.124.62:4321'],reason:''}}={}){
+function fixture({url='http://localhost:3210/#/',key=false,configOverride={},initialRecords=[],deleteError=false,lookupImpl=lookupNameStrokes,dailyImpl=dailyFortune,network={available:true,urls:['http://192.168.124.62:4321'],reason:''}}={}){
   const dom=new JSDOM(readFileSync(new URL('../public/index.html',import.meta.url),'utf8'),{url,runScripts:'outside-only'});
-  const w=dom.window;const saved=structuredClone(initialRecords);const requests=[];const operations=[];let settings={...DEFAULT_CONFIG,pricing:{...DEFAULT_CONFIG.pricing},apiKey:undefined,hasKey:key,network};
+  const w=dom.window;const saved=structuredClone(initialRecords);const requests=[];const operations=[];let settings={...DEFAULT_CONFIG,pricing:{...DEFAULT_CONFIG.pricing},apiKey:undefined,hasKey:key,network,...configOverride};
   w.matchMedia=()=>({matches:false});w.scrollTo=()=>{};
   w.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','');};
   w.HTMLDialogElement.prototype.close=function(value){if(value!==undefined)this.returnValue=value;this.removeAttribute('open');this.dispatchEvent(new w.Event('close'));};
   w.fetch=async(path,options={})=>{
     requests.push(path);
+    path=path.replace(/^\/fortuneteller(?=\/)/,'');
     operations.push({path,method:options.method||'GET'});
     if(path==='/api/daily')return Response.json(await dailyImpl());
     if(path==='/styles.css')return new Response(readFileSync(new URL('../public/styles.css',import.meta.url),'utf8'));
@@ -199,6 +200,27 @@ test('页面显示实际局域网URL，各页面保留提示且支持复制',asy
   }finally{close();}
 });
 
+test('DSH 展示并复制观象挂载地址，记录分享不重复添加路径',async()=>{
+  const r=savedReading('局域网分享');
+  const {w,close}=fixture({url:'http://127.0.0.1:3080/fortuneteller/#/',initialRecords:[r],network:{available:true,urls:['http://192.168.124.62:4321/fortuneteller/'],reason:''},configOverride:{generation:'dsh'}});
+  const d=w.document;let copied;
+  Object.defineProperty(w.navigator,'clipboard',{value:{writeText:async value=>{copied=value;}}});
+  try{
+    await until(()=>d.querySelector('.lan-link a'));
+    assert.equal(d.querySelector('.lan-link a').textContent,'http://192.168.124.62:4321/fortuneteller/');
+    assert.match(d.querySelector('.lan-notice').textContent,/打开观象/);
+    assert.ok(!d.querySelector('.lan-notice').textContent.includes('无需登录'));
+    d.querySelector('[data-action=copy-lan]').click();await until(()=>copied);
+    assert.equal(copied,'http://192.168.124.62:4321/fortuneteller/');
+    await navigate(w,'/settings','#settings-form');
+    assert.match(d.querySelector('.open-settings').textContent,/当前地址：http:\/\/127\.0\.0\.1:3080/);
+    assert.ok(d.querySelector('.open-settings').textContent.includes('/fortuneteller/'));
+    await navigate(w,'/record/'+r.id,'[data-share]');d.querySelector('[data-share]').click();
+    await until(()=>d.querySelector('#share-dialog').open);
+    assert.equal(d.querySelector('#share-url').value,'http://192.168.124.62:4321/fortuneteller/#/record/'+r.id);
+  }finally{close();}
+});
+
 test('无可用局域网地址时说明原因，保持其他功能可用',async()=>{
   const {w,close}=fixture({network:{available:false,urls:[],reason:'未检测到可用的 192.168.* 局域网地址'}});
   try{
@@ -248,5 +270,18 @@ test('解读与费用小字显示，模型内容不会作为HTML脚本执行',as
     d.querySelector('#reading-form').dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await until(()=>d.querySelector('[data-analyze]'));d.querySelector('[data-analyze]').click();await until(()=>d.querySelector('.usage-line'));
     assert.match(d.querySelector('.usage-line').textContent,/合计 150 tokens/);assert.match(d.querySelector('.usage-line').textContent,/¥0.000560/);
     assert.equal(d.querySelector('.report img'),null);assert.equal(d.querySelector('.question-quote script'),null);assert.match(d.querySelector('.report').textContent,/<img/);
+  }finally{close();}
+});
+
+test('DSH 挂载路径使用宿主生成配置，设置页无需 Key 或模型表单，保存单价不修改宿主配置',async()=>{
+  const r=savedReading('DSH 路径');
+  const {w,requests,close}=fixture({url:'http://127.0.0.1:3080/fortuneteller/#/',key:true,initialRecords:[r],network:{available:false,urls:[],reason:'访问范围与认证由 DSH Web 管理'},configOverride:{generation:'dsh',provider:'deepseek-official',model:'deepseek-flash',keyManagedBy:'dsh'}});
+  const d=w.document;
+  try{
+    await until(()=>d.querySelector('.method-grid'));assert.ok(requests.includes('/fortuneteller/api/config'));
+    assert.match(d.querySelector('.brand img').getAttribute('src'),/^\/fortuneteller\//);
+    await navigate(w,'/settings','#settings-form');assert.equal(d.querySelector('[name=apiKey]'),null);assert.equal(d.querySelector('[name=model]'),null);assert.match(d.querySelector('#settings-form').textContent,/DSH Web 生成服务/);
+    d.querySelector('[name=output]').value='9';d.querySelector('#settings-form').dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await until(()=>d.querySelector('#toast').textContent==='设置已保存');
+    await navigate(w,'/record/'+r.id,'[data-share]');d.querySelector('[data-share]').click();await until(()=>d.querySelector('#share-dialog').open);assert.equal(d.querySelector('#share-url').value,'http://127.0.0.1:3080/fortuneteller/#/record/'+r.id);
   }finally{close();}
 });

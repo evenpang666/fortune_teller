@@ -1,30 +1,25 @@
-# 开发、验证与项目结构
+# 开发与验证
 
-[返回项目首页](../README.md) · [文档目录](README.md)
-
-## 本地开发
+[返回首页](../README.md)
 
 ```bash
 npm ci
-npm run dev
 npm run check
 npm test
+npm run dev
 ```
 
-没有前端构建步骤或远程字体/CDN依赖。运行测试需要允许本地 HTTP 监听。34 项测试覆盖四柱节气与子时边界、非法日期、紫微时辰、天文 UTC 换算、抽牌唯一性、卦序/变爻、五格、自动康熙笔画/简繁差异/未收录回退、费用分项、免登录访问、Host/Origin 校验、历史重启、单条删除持久化、重复调用缓存、并发保护、真实 Cordis 插件生命周期、局域网地址筛选与监听范围，以及 JSDOM 中的局域网直接进入/旧启动链接兼容/八个页面提交/自动笔画填写与手动调整/查询防覆盖/主题切换/设置/局域网地址展示与复制/删除确认与取消/删除失败恢复/安全解读渲染。DeepSeek 网络测试使用模拟响应，不消耗真实 token。真实 API、Windows 启动和完整 DSH Web 挂载需在相应环境验证；浏览器控制工具超时，尚未完成真实浏览器视觉检查。
+`dev` 与正式启动共用环境检查、插件安装和服务复用流程，正式启动默认打开观象；`dev` 携带 `--no-open`，不打开浏览器。无前端构建步骤。
 
-## 项目结构
+| 目录 / 文件 | 职责 |
+| --- | --- |
+| `index.mjs` / `client.js` | DSH Host 路由与原生 Slot 入口 |
+| `lib/dsh.mjs` | 宿主默认模型选择、流式生成、用量与错误映射 |
+| `lib/deepseek.mjs` | Skill 提示构造与费用计算，不直接请求提供方 |
+| `lib/server.mjs` | 可挂载 HTTP handler、排盘与历史接口 |
+| `scripts/environment.mjs` | 依赖同步、已有 DSH / pnpm 复用和 profile 检查 |
+| `scripts/launch.mjs` | 启动锁、服务探测与复用、DSH 进程生命周期 |
+| `start.sh` / `scripts/bootstrap.ps1` | 缺失或过旧 Node 的隔离安装 |
+| `test/` | 排盘、数据、DSH 适配、启动检测和 UI 回归 |
 
-```text
-public/       中文响应式界面
-lib/          本地规则计算、SQLite、DeepSeek 和 HTTP 服务
-skills/       八种独立分析 Skill
-scripts/      一键启动与语法/资源检查
-test/         规则、服务、插件与页面交互测试
-docs/         配置、规则、费用、数据与开发文档
-index.mjs     DSH Host 插件
-client.js     DSH Web 原生入口
-cordis.patch.yml  插件 Bundle 配置
-```
-
-MIT License。第三方包许可请见各依赖目录中的 LICENSE；SVG 图标及界面装饰为原创。
+HTTP 测试需要本地监听权限。生成测试使用模拟 DSH 流，不消耗真实模型 token。测试包括模型动态切换、凭据不进入插件参数、缓存、用量归一化、认证、错误 / 中断恢复、路由和 Skill 卸载。真实 DSH 隔离启动验证与平台限制以本次交付说明为准；Windows bootstrap 需在 Windows 实机验证。

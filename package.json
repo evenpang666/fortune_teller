@@ -1,11 +1,13 @@
 {
   "name": "dsh-fortuneteller",
-  "version": "0.1.0",
-  "description": "观象 · DeepSeek Harness 本地 AI 命理工作室",
+  "version": "0.2.0",
+  "description": "观象 · 使用 DSH Web 模型与凭据的命理工作室插件",
+  "icon": "./public/icon.svg",
   "type": "module",
   "private": true,
   "exports": {
     ".": "./index.mjs",
+    "./package.json": "./package.json",
     "./client": "./client.js",
     "./locale/*.json": "./locale/*.json",
     "./icon": "./public/icon.svg"
@@ -42,8 +44,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "start": "node scripts/launch.mjs",
-    "dev": "node scripts/launch.mjs --no-open",
+    "start": "node --disable-warning=UNDICI-EHPA scripts/launch.mjs",
+    "dev": "node --disable-warning=UNDICI-EHPA scripts/launch.mjs --no-open",
     "test": "node --test test/*.test.mjs",
     "check": "node scripts/check.mjs"
   },

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeChart, lookupNameStrokes, hexagram, draw } from '../lib/rules.mjs';
 import { TAROT_DECK, HEX_MATRIX, TRIGRAMS } from '../lib/methods.mjs';
-import { normalizeUsage, estimateCost, analyze, buildMessages } from '../lib/deepseek.mjs';
+import { normalizeUsage, estimateCost, buildMessages } from '../lib/deepseek.mjs';
 
 const birth={date:'1986-05-29',time:'00:00',gender:'女',question:'如何适应新的工作？'};
 test('八字与历法库公开示例一致，并且采用节气年界',()=>{
@@ -105,18 +105,4 @@ test('费用按实际缓存命中和输出分项，缺失用量显示未知',()=
   assert.deepEqual(u,{input:1000,output:500,total:1500,hit:800,miss:200,reasoning:null});
   assert.equal(estimateCost(u,{hit:.04,miss:2,output:8,currency:'CNY'}).amount,.004432);
   assert.equal(normalizeUsage({}),null);assert.equal(estimateCost(null,{}),null);
-});
-test('八种分析会加载对应Skill，HTTP与空输出失败不会伪造解读',async()=>{
-  for(const method of ['bazi','ziwei','zodiac','tarot','poker','iching','lot','name']){
-    const r=makeChart(method,{...birth,surname:'王',given:'知远',surnameStrokes:[4],givenStrokes:[8,17]});
-    const messages=buildMessages(r);assert.equal(messages.length,2);assert.ok(messages[0].content.length>400);
-    assert.match(messages[0].content,/仅输出两个部分：## 关键信息解读、## 实践建议/);
-    assert.ok(!messages[0].content.includes('末尾说明子时规则'));
-  }
-  const r=makeChart('lot',{question:'方向'});const config={apiKey:'test-key',model:'deepseek-flash',pricing:{hit:.04,miss:2,output:8,currency:'CNY'}};
-  await assert.rejects(analyze(r,{...config,apiKey:''}),/API Key/);
-  await assert.rejects(analyze(r,config,{fetchImpl:async()=>new Response('',{status:401})}),/API Key 无效/);
-  await assert.rejects(analyze(r,config,{fetchImpl:async()=>Response.json({choices:[{message:{content:''}}]})}),/未返回/);
-  const report=await analyze(r,config,{fetchImpl:async(url,options)=>{assert.equal(url,'https://api.deepseek.com/chat/completions');assert.equal(JSON.parse(options.body).model,'deepseek-flash');return Response.json({choices:[{message:{content:'测试解读'},finish_reason:'stop'}],usage:{prompt_tokens:1000,completion_tokens:500,prompt_cache_hit_tokens:800}});}});
-  assert.equal(report.report,'测试解读');assert.equal(report.cost.amount,.004432);
 });
